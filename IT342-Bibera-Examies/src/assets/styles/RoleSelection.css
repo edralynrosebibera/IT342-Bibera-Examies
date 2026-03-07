@@ -1,0 +1,63 @@
+/* RoleSelection.css */
+
+.role-selection {
+  text-align: left;
+}
+
+.selection-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.role-cards {
+  display: flex;
+  gap: 20px;
+}
+
+.role-card {
+  flex: 1;
+  border: 2px solid #f1f3f6;
+  border-radius: 20px;
+  padding: 30px 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: #fff;
+}
+
+.role-card:hover {
+  border-color: #7b61ff;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(123, 97, 255, 0.1);
+}
+
+.role-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 15px;
+  font-size: 24px;
+}
+
+/* Matching the screenshot colors */
+.student-bg {
+  background-color: #f3f0ff;
+  color: #7b61ff;
+}
+
+.teacher-bg {
+  background-color: #fff0f6;
+  color: #e94b9e;
+}
+
+.role-card p {
+  margin: 0;
+  font-weight: 600;
+  color: #333;
+  font-size: 15px;
+}

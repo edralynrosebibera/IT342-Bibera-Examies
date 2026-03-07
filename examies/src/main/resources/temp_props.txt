@@ -1,0 +1,16 @@
+spring.application.name=examies
+
+spring.datasource.url=jdbc:postgresql://aws-1-ap-northeast-1.pooler.supabase.com:6543/postgres
+spring.datasource.username=postgres.oexfntatuhhwesfiredq
+spring.datasource.password=biberaexamiesproject09215542960
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+
+jwt.secret=ExamiesSecureJwtSecretKey2026!!
+jwt.expiration-ms=3600000
+jwt.refresh-expiration-ms=86400000
+
+# Supabase Configuration
+supabase.url=https://oexfntatuhhwesfiredq.supabase.co
+
+server.port=8081
