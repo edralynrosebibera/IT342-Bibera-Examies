@@ -33,7 +33,7 @@ const LoginForm = () => {
       }
 
       if (data.user) {
-        toast.success("Welcome back to ExamFlow!");
+        toast.success("Login Successful!");
         navigate("/dashboard");
       }
     } catch (error) {
@@ -71,8 +71,8 @@ const LoginForm = () => {
         </div>
       </div>
 
-      <div className="forgot-link-container">
-        <span className="forgot-pw">Forgot password?</span>
+      <div className="forgot-password-container">
+        <span className="forgot-pw-text">Forgot password?</span>
       </div>
 
       <button type="submit" className="submit-btn" disabled={loading}>
@@ -89,7 +89,7 @@ const LoginForm = () => {
         onClick={() => toast.info("Google login coming soon!")}
       >
         <img
-          src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/layout/google.svg"
+          src="https://i.pinimg.com/1200x/45/20/dd/4520ddfc56208707045c56232e946f7f.jpg"
           alt="Google"
           className="google-icon"
         />

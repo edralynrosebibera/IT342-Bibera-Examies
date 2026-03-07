@@ -1,7 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import { toast } from 'sonner';
+import React, { useState } from 'react';
 import ExamCard from '../assets/cards/ExamCard';
 import "../assets/styles/StudentDashboard.css";
 
@@ -15,94 +12,82 @@ const EXAMS_DATA = [
 ];
 
 const StudentDashboard = () => {
-  const { user, signOut } = useAuth();
-  const navigate = useNavigate();
-  const [filter, setFilter] = useState('All'); // 'All', 'Completed', 'Upcoming'
+  const [filter, setFilter] = useState('All');
 
-  useEffect(() => {
-    if (!user) {
-      navigate('/');
-    }
-  }, [user, navigate]);
-
-  const handleSignOut = async () => {
-    try {
-      await signOut();
-      toast.success('Signed out successfully');
-      navigate('/');
-    } catch (error) {
-      toast.error('Error signing out');
-    }
-  };
-
-  const filteredExams = EXAMS_DATA.filter(exam =>
+  const filteredExams = EXAMS_DATA.filter(exam => 
     filter === 'All' ? true : exam.status === filter
   );
 
-  const stats = {
-    total: EXAMS_DATA.length,
-    completed: EXAMS_DATA.filter(e => e.status === 'Completed').length,
-    upcoming: EXAMS_DATA.filter(e => e.status === 'Upcoming').length,
-    classes: 4
-  };
-
-  if (!user) {
-    return <div>Loading...</div>;
-  }
-
   return (
-    <div className="dashboard-container">
-      <header className="dashboard-header">
-        <h2>Welcome back, {user.user_metadata?.first_name || 'Student'} 👋</h2>
-        <p>Here's an overview of your exams</p>
-        <button onClick={handleSignOut} className="sign-out-btn">
-          Sign Out
-        </button>
-      </header>
+    <div className="dashboard-page">
+      {/* 1. TOP NAVBAR */}
+      <nav className="navbar">
+        <div className="nav-left">
+          <div className="nav-logo">🎓</div>
+          <span className="nav-brand">ExamHub</span>
+        </div>
+        <div className="nav-right">
+          <div className="nav-icon">🔔<span className="dot"></span></div>
+          <div className="nav-profile">👤</div>
+        </div>
+      </nav>
 
-      {/* Stats Grid */}
-      <div className="stats-grid">
-        <button className={`stat-card ${filter === 'All' ? 'active' : ''}`} onClick={() => setFilter('All')}>
-          <div className="stat-icon purple">📄</div>
-          <div className="stat-info">
-            <span className="stat-label">Total Exams</span>
-            <span className="stat-value">{stats.total}</span>
-          </div>
-        </button>
+      <div className="dashboard-content">
+        {/* 2. WELCOME HEADER */}
+        <header className="welcome-section">
+          <h1>Welcome back, Student 👋</h1>
+          <p>Here's an overview of your exams</p>
+        </header>
 
-        <button className={`stat-card ${filter === 'Completed' ? 'active' : ''}`} onClick={() => setFilter('Completed')}>
-          <div className="stat-icon green">✔️</div>
-          <div className="stat-info">
-            <span className="stat-label">Completed</span>
-            <span className="stat-value">{stats.completed}</span>
-          </div>
-        </button>
+        {/* 3. STAT BUTTONS GRID */}
+        <div className="stats-container">
+          <button className={`stat-btn ${filter === 'All' ? 'active' : ''}`} onClick={() => setFilter('All')}>
+            <div className="icon-box purple-bg">📄</div>
+            <div className="text-box">
+              <span className="label">Total Exams</span>
+              <span className="count">6</span>
+            </div>
+          </button>
 
-        <button className={`stat-card ${filter === 'Upcoming' ? 'active' : ''}`} onClick={() => setFilter('Upcoming')}>
-          <div className="stat-icon pink">⏰</div>
-          <div className="stat-info">
-            <span className="stat-label">Upcoming</span>
-            <span className="stat-value">{stats.upcoming}</span>
-          </div>
-        </button>
+          <button className={`stat-btn ${filter === 'Completed' ? 'active' : ''}`} onClick={() => setFilter('Completed')}>
+            <div className="icon-box green-bg">✔️</div>
+            <div className="text-box">
+              <span className="label">Completed</span>
+              <span className="count">3</span>
+            </div>
+          </button>
 
-        <div className="stat-card static">
-          <div className="stat-icon blue">🎓</div>
-          <div className="stat-info">
-            <span className="stat-label">Classes</span>
-            <span className="stat-value">{stats.classes}</span>
+          <button className={`stat-btn ${filter === 'Upcoming' ? 'active' : ''}`} onClick={() => setFilter('Upcoming')}>
+            <div className="icon-box pink-bg">⏰</div>
+            <div className="text-box">
+              <span className="label">Upcoming</span>
+              <span className="count">3</span>
+            </div>
+          </button>
+
+          <button className="stat-btn">
+            <div className="icon-box blue-bg">🎓</div>
+            <div className="text-box">
+              <span className="label">Classes</span>
+              <span className="count">4</span>
+            </div>
+          </button>
+        </div>
+
+        {/* 4. SEARCH BAR */}
+        <div className="search-section">
+          <div className="search-wrapper">
+            <span className="search-icon">🔍</span>
+            <input type="text" placeholder="Search exams..." />
           </div>
         </div>
-      </div>
 
-      <div className="search-bar-container">
-        <input type="text" placeholder="Search exams..." className="search-input" />
-      </div>
-
-      <div className="exams-grid">
-        {filteredExams.map(exam => (
-          <ExamCard key={exam.id} exam={exam} />
-        ))}
+        {/* 5. EXAM CARDS GRID */}
+        <div className="exams-display-grid">
+          {filteredExams.map(exam => (
+            <ExamCard key={exam.id} exam={exam} />
+          ))}
+        </div>
       </div>
     </div>
   );

@@ -50,3 +50,25 @@
   width: 20px;
   height: 20px;
 }
+
+/* LoginForm.css */
+
+.forgot-password-container {
+  width: 100%;             
+  text-align: right;       
+  margin-top: -10px;       
+  margin-bottom: 25px;     
+}
+
+.forgot-pw-text {
+  color: #7b61ff;         
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.forgot-pw-text:hover {
+  text-decoration: underline;
+  color: #e94b9e;         
+}
