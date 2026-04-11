@@ -20,21 +20,24 @@ public class EnrollmentService {
 
     public ResponseEntity<?> joinClass(JoinClassRequest request) {
 
+        // 🔥 Find class using password ONLY
+        ClassesEntity cls = classesRepository
+                .findByClassPassword(request.classPassword);
+
+        if (cls == null) {
+            return ResponseEntity.badRequest().body("Class not found");
+        }
+
+        // 🔥 Check if already enrolled
         if (enrollmentRepository.existsByStudentIdAndClassId(
-                request.studentId, request.classId)) {
+                request.studentId, cls.getId())) {
             return ResponseEntity.badRequest().body("Already enrolled");
         }
 
-        ClassesEntity cls = classesRepository.findById(request.classId)
-                .orElseThrow();
-
-        if (!cls.getClassPassword().equals(request.classPassword)) {
-            return ResponseEntity.badRequest().body("Invalid password");
-        }
-
+        // 🔥 Save enrollment
         EnrollmentEntity enrollment = EnrollmentEntity.builder()
                 .studentId(request.studentId)
-                .classId(request.classId)
+                .classId(cls.getId())
                 .enrolledAt(LocalDateTime.now())
                 .build();
 

@@ -23,7 +23,7 @@ const ClassesView = () => {
         );
         const data = await res.json();
 
-        setClasses(data);
+      setClasses(Array.isArray(data) ? data : []);
 
       } catch (error) {
         console.error(error);

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useAuth } from '../contexts/AuthContext';
+import { supabase } from "../lib/supabase"; 
 import "../assets/styles/LoginForm.css";
 
 const LoginForm = () => {
@@ -47,6 +48,13 @@ const LoginForm = () => {
       console.log("userData:", userData);
 
       const role = userData.role?.toLowerCase();
+
+      await supabase.auth.updateUser({
+        data: { role: role }
+      });
+
+      await supabase.auth.refreshSession();
+
 
         console.log("Backend role:", role);
 

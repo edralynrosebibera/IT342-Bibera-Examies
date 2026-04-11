@@ -26,4 +26,9 @@ public class ClassesController {
     public ResponseEntity<List<ClassesEntity>> getClassesByInstructor(@PathVariable Long id) {
         return ResponseEntity.ok(classesService.getClassesByInstructor(id));
     }
+
+    @GetMapping("/student/{id}")
+    public ResponseEntity<List<ClassesEntity>> getClassesByStudent(@PathVariable Long id) {
+        return ResponseEntity.ok(classesService.getClassesByStudent(id));
+    }
 }

@@ -1,21 +1,24 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 import ExamCard from '../assets/cards/ExamCard';
+import StudentClassesView from "../assets/cards/StudentClassesView";
 import "../assets/styles/StudentDashboard.css";
 
-const EXAMS_DATA = [
-  { id: 1, title: "Mathematics Final", subject: "Mathematics", date: "Mar 10, 2026", duration: "2 hours", questions: 40, status: "Upcoming" },
-  { id: 2, title: "Physics Midterm", subject: "Physics", date: "Mar 8, 2026", duration: "1.5 hours", questions: 30, status: "Upcoming" },
-  { id: 3, title: "English Literature", subject: "English", date: "Mar 5, 2026", duration: "1 hour", questions: 25, status: "Completed" },
-  { id: 4, title: "Chemistry Quiz", subject: "Chemistry", date: "Mar 3, 2026", duration: "45 mins", questions: 20, status: "Completed" },
-  { id: 5, title: "History Essay", subject: "History", date: "Feb 28, 2026", duration: "2 hours", questions: 5, status: "Completed" },
-  { id: 6, title: "Biology Lab Test", subject: "Biology", date: "Mar 12, 2026", duration: "1 hour", questions: 35, status: "Upcoming" },
-];
+
 
 const StudentDashboard = () => {
   const [filter, setFilter] = useState('All');
   const [showDropdown, setShowDropdown] = useState(false);
+  const [exams, setExams] = useState([]);
+
+  // 🔥 NEW STATES
+  const [classPassword, setClassPassword] = useState("");
 
   const dropdownRef = useRef();
+
+  const navigate = useNavigate();
+  const { user, signOut } = useAuth();
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -24,20 +27,87 @@ const StudentDashboard = () => {
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+        document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  }
+  
+  , []);
 
-  const filteredExams = EXAMS_DATA.filter(exam => 
-    filter === 'All' ? true : exam.status === filter
-  );
+  useEffect(() => {
+    const fetchExams = async () => {
+      try {
+        const userRes = await fetch(
+          `http://localhost:8080/api/auth/me?email=${user.email}`
+        );
+        const userData = await userRes.json();
 
-  const handleLogout = () => {
-    console.log("Logout clicked");
+        const classRes = await fetch(
+          `http://localhost:8080/api/classes/student/${userData.id}`
+        );
+        const classes = await classRes.json();
+
+        let allExams = [];
+
+        for (let cls of classes) {
+          const res = await fetch(
+            `http://localhost:8080/api/exams/class/${cls.id}`
+          );
+          const exams = await res.json();
+          allExams = [...allExams, ...exams];
+        }
+
+        setExams(allExams);
+
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    if (user) fetchExams();
+  }, [user]);
+
+
+
+
+
+  // 🔥 WORKING LOGOUT
+  const handleLogout = async () => {
+    await signOut(); // clears supabase session
+    navigate("/");   // goes to ExamFlowAuth
   };
 
   const handleViewProfile = () => {
     console.log("View Profile clicked");
+  };
+
+  // 🔥 JOIN CLASS FUNCTION
+  const handleJoinClass = async () => {
+    try {
+      const userRes = await fetch(
+        `http://localhost:8080/api/auth/me?email=${user.email}`
+      );
+      const userData = await userRes.json();
+
+      await fetch("http://localhost:8080/api/enrollments/join", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          studentId: userData.id,
+          classPassword: classPassword
+        })
+      });
+
+      console.log("Joined class!");
+
+      
+      setClassPassword("");
+      
+
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -116,7 +186,7 @@ const StudentDashboard = () => {
             </div>
           </button>
 
-          <button 
+          <button
             className={`stat-btn ${filter === 'Upcoming' ? 'active' : ''}`} 
             onClick={() => setFilter('Upcoming')}
           >
@@ -127,28 +197,56 @@ const StudentDashboard = () => {
             </div>
           </button>
 
-          <button className="stat-btn">
-            <div className="icon-box blue-bg">🎓</div>
-            <div className="text-box">
-              <span className="label">Classes</span>
-              <span className="count">4</span>
-            </div>
-          </button>
+        <button
+          className={`stat-btn ${filter === 'Classes' ? 'active' : ''}`} 
+          onClick={() => setFilter('Classes')}
+        >
+          <div className="icon-box blue-bg">🎓</div>
+          <div className="text-box">
+            <span className="label">Classes</span>
+            <span className="count">--</span>
+          </div>
+
+        </button>
+
         </div>
 
-        {/* SEARCH */}
+        {/* 🔥 SEARCH + JOIN CLASS */}
         <div className="search-section">
+
           <div className="search-wrapper">
             <span className="search-icon">🔍</span>
             <input type="text" placeholder="Search exams..." />
           </div>
+
+          <div style={{ display: "flex", gap: "8px", marginTop: "-30px"}}>
+  
+          <input
+            type="text"
+            placeholder="Class Password"
+            value={classPassword}
+            onChange={(e) => setClassPassword(e.target.value)}
+          />
+
+          <button className="create-btn" onClick={handleJoinClass}>
+            Join Class
+          </button>
+
+        </div>
+
         </div>
 
         {/* EXAMS GRID */}
         <div className="exams-display-grid">
-          {filteredExams.map(exam => (
-            <ExamCard key={exam.id} exam={exam} />
-          ))}
+
+          {filter === "Classes" ? (
+            <StudentClassesView />
+          ) : (
+            exams.map(exam => (
+              <ExamCard key={exam.id} exam={exam} />
+            ))
+          )}
+
         </div>
 
       </div>
