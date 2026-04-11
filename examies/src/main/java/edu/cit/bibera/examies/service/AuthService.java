@@ -13,6 +13,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -200,5 +201,15 @@ public class AuthService {
             log.error("Error during signout", e);
             throw new RuntimeException("Signout failed: " + e.getMessage());
         }
+    }
+
+        public ResponseEntity<?> getUserByEmail(String email) {
+        Optional<Users> userOpt = usersRepository.findByEmail(email);
+
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.status(404).body("User not found");
+        }
+
+        return ResponseEntity.ok(userOpt.get());
     }
 }

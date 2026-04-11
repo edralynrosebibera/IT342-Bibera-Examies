@@ -34,7 +34,29 @@ const LoginForm = () => {
 
       if (data.user) {
         toast.success("Login Successful!");
-        navigate("/dashboard");
+
+      const res = await fetch(
+        `http://localhost:8080/api/auth/me?email=${data.user.email}`
+      );
+
+      if (!res.ok) {
+        throw new Error("Failed to fetch user role");
+      }
+
+      const userData = await res.json();
+      console.log("userData:", userData);
+
+      const role = userData.role?.toLowerCase();
+
+        console.log("Backend role:", role);
+
+        if (role === "student") {
+          navigate("/student-dashboard");
+        } else if (role === "teacher") {
+          navigate("/teacher-dashboard");
+        } else {
+          navigate("/dashboard");
+        }
       }
     } catch (error) {
       toast.error("Login failed. Please try again.");

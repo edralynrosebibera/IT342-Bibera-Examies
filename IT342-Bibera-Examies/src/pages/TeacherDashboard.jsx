@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from "react-router-dom";
 import ExamCard from '../assets/cards/ExamCard';
+import ClassesView from "../assets/cards/ClassesView";
 import "../assets/styles/TeacherDashboard.css";
 
 const EXAMS_DATA = [
@@ -14,6 +16,8 @@ const EXAMS_DATA = [
 const TeacherDashboard = () => {
   const [filter, setFilter] = useState('All');
   const [showDropdown, setShowDropdown] = useState(false);
+
+  const navigate = useNavigate();
 
   const dropdownRef = useRef();
 
@@ -34,7 +38,9 @@ const TeacherDashboard = () => {
 
   const handleLogout = () => console.log("Logout clicked");
   const handleViewProfile = () => console.log("View Profile clicked");
-  const handleCreateExam = () => console.log("Create Exam clicked");
+  const handleCreateExam = () => {
+    navigate("/create-exam");
+  };
 
   return (
     <div className="dashboard-page">
@@ -105,7 +111,10 @@ const TeacherDashboard = () => {
             </div>
           </button>
 
-          <button className="stat-btn">
+          <button 
+            className={`stat-btn ${filter === 'Classes' ? 'active' : ''}`}
+            onClick={() => setFilter('Classes')}
+          >
             <div className="icon-box blue-bg">🎓</div>
             <div className="text-box">
               <span className="label">Classes</span>
@@ -121,15 +130,34 @@ const TeacherDashboard = () => {
             <input type="text" placeholder="Search exams..." />
           </div>
 
-          <button className="create-btn" onClick={handleCreateExam}>
-            + Create Exam
-          </button>
+          <div style={{ display: "flex", gap: "10px" }}>
+
+            <button className="create-btn" onClick={handleCreateExam}>
+              + Create Exam
+            </button>
+
+            {filter === "Classes" && (
+              <button 
+                className="create-btn secondary"
+                onClick={() => navigate("/create-class")}
+              >
+                + Create Class
+              </button>
+            )}
+
+          </div>
         </div>
 
         <div className="exams-display-grid">
-          {filteredExams.map(exam => (
-            <ExamCard key={exam.id} exam={exam} />
-          ))}
+
+          {filter === "Classes" ? (
+            <ClassesView />
+          ) : (
+            filteredExams.map(exam => (
+              <ExamCard key={exam.id} exam={exam} />
+            ))
+          )}
+
         </div>
 
       </div>

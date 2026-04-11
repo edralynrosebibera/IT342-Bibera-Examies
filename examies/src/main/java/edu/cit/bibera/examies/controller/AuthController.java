@@ -45,4 +45,13 @@ public class AuthController {
             return ResponseEntity.badRequest().build();
         }
     }
+    @GetMapping("/me")
+    public ResponseEntity<?> getCurrentUser(@RequestParam String email) {
+        try {
+            return authService.getUserByEmail(email);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }
+
