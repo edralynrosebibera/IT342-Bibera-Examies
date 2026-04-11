@@ -2,6 +2,8 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import ExamFlowAuth from "./pages/ExamFlowAuth";
 import StudentDashboard from "./pages/StudentDashboard";
+import TeacherDashboard from "./pages/TeacherDashboard";
+import CreateExam from "./pages/CreateExam";
 import AnimatedBackground from "./pages/AnimatedBackground";
 import { Toaster } from "sonner";
 import { AuthProvider } from "./contexts/AuthContext";
@@ -20,6 +22,8 @@ function App() {
 
             {/* The Student Dashboard Page */}
             <Route path="/dashboard" element={<StudentDashboard />} />
+            <Route path="/teacher-dashboard" element={<TeacherDashboard />} />
+            <Route path="/create-exam" element={<CreateExam />} />
           </Routes>
 
           <Toaster position="top-right" richColors />
