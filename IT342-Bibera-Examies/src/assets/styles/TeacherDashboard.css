@@ -1,0 +1,26 @@
+@import "./StudentDashboard.css";
+
+
+.search-section {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.create-btn {
+  padding: 12px 20px;
+  border-radius: 12px;
+  border: none;
+  background: #7b61ff;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s ease;
+  box-shadow: 0 4px 10px rgba(123,97,255,0.3);
+}
+
+.create-btn:hover {
+  transform: translateY(-2px);
+  background: #6a4df5;
+}
+
