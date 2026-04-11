@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from "react-router-dom";
 import "../assets/styles/CreateExam.css";
 import "../assets/styles/StudentDashboard.css";
 
@@ -16,6 +17,7 @@ const CreateExam = () => {
   ]);
 
   const [activeQuestion, setActiveQuestion] = useState(1);
+  const navigate = useNavigate();
 
   const activeQ = questions.find(q => q.id === activeQuestion);
 
@@ -114,7 +116,7 @@ const CreateExam = () => {
   };
 
   const handleBack = () => {
-    console.log("GO BACK");
+    navigate("/teacher-dashboard");
   };
 
   return (
