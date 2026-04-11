@@ -1,23 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 import ExamCard from '../assets/cards/ExamCard';
 import ClassesView from "../assets/cards/ClassesView";
 import "../assets/styles/TeacherDashboard.css";
 
-const EXAMS_DATA = [
-  { id: 1, title: "Mathematics Final", subject: "Mathematics", date: "Mar 10, 2026", duration: "2 hours", questions: 40, status: "Upcoming" },
-  { id: 2, title: "Physics Midterm", subject: "Physics", date: "Mar 8, 2026", duration: "1.5 hours", questions: 30, status: "Upcoming" },
-  { id: 3, title: "English Literature", subject: "English", date: "Mar 5, 2026", duration: "1 hour", questions: 25, status: "Completed" },
-  { id: 4, title: "Chemistry Quiz", subject: "Chemistry", date: "Mar 3, 2026", duration: "45 mins", questions: 20, status: "Completed" },
-  { id: 5, title: "History Essay", subject: "History", date: "Feb 28, 2026", duration: "2 hours", questions: 5, status: "Completed" },
-  { id: 6, title: "Biology Lab Test", subject: "Biology", date: "Mar 12, 2026", duration: "1 hour", questions: 35, status: "Upcoming" },
-];
+
 
 const TeacherDashboard = () => {
   const [filter, setFilter] = useState('All');
   const [showDropdown, setShowDropdown] = useState(false);
+  const [exams, setExams] = useState([]);
 
   const navigate = useNavigate();
+  const { user, signOut } = useAuth();
 
   const dropdownRef = useRef();
 
@@ -28,15 +24,39 @@ const TeacherDashboard = () => {
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+        document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const filteredExams = EXAMS_DATA.filter(exam => 
-    filter === 'All' ? true : exam.status === filter
-  );
+    const fetchExams = async () => {
+      try {
+        const userRes = await fetch(
+          `http://localhost:8080/api/auth/me?email=${user.email}`
+        );
+        const userData = await userRes.json();
 
-  const handleLogout = () => console.log("Logout clicked");
+        const res = await fetch(
+          `http://localhost:8080/api/exams/teacher/${userData.id}`
+        );
+        const data = await res.json();
+
+        setExams(Array.isArray(data) ? [...data] : []);
+
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+  useEffect(() => {
+    if (user) fetchExams();
+  }, [user]);
+
+
+    const handleLogout = async () => {
+    await signOut(); // clears supabase session
+    navigate("/");   // goes to ExamFlowAuth
+  };
+
   const handleViewProfile = () => console.log("View Profile clicked");
   const handleCreateExam = () => {
     navigate("/create-exam");
@@ -70,7 +90,10 @@ const TeacherDashboard = () => {
                 <div className="dropdown-item" onClick={handleViewProfile}>
                   View Profile
                 </div>
-                <div className="dropdown-item logout" onClick={handleLogout}>
+                <div 
+                  className="dropdown-item logout"
+                  onClick={handleLogout}
+                >
                   Logout
                 </div>
               </div>
@@ -153,8 +176,8 @@ const TeacherDashboard = () => {
           {filter === "Classes" ? (
             <ClassesView />
           ) : (
-            filteredExams.map(exam => (
-              <ExamCard key={exam.id} exam={exam} />
+            Array.isArray(exams) && exams.map(exam => (
+              <ExamCard key={exam.id} exam={exam} refreshExams={fetchExams} />
             ))
           )}
 

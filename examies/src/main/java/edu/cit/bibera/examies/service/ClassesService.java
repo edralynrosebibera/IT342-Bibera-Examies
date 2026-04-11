@@ -3,8 +3,10 @@ package edu.cit.bibera.examies.service;
 import edu.cit.bibera.examies.dto.CreateClassRequest;
 import edu.cit.bibera.examies.entity.ClassesEntity;
 import edu.cit.bibera.examies.repository.ClassesRepository;
+import edu.cit.bibera.examies.repository.EnrollmentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import edu.cit.bibera.examies.entity.EnrollmentEntity;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,6 +16,7 @@ import java.util.List;
 public class ClassesService {
 
     private final ClassesRepository classesRepository;
+    private final EnrollmentRepository enrollmentRepository;
 
     public ClassesEntity createClass(CreateClassRequest request) {
 
@@ -30,4 +33,14 @@ public class ClassesService {
     public List<ClassesEntity> getClassesByInstructor(Long instructorId) {
         return classesRepository.findByInstructorId(instructorId);
     }
+
+    public List<ClassesEntity> getClassesByStudent(Long studentId) {
+
+    List<EnrollmentEntity> enrollments =
+            enrollmentRepository.findByStudentId(studentId);
+
+    return enrollments.stream()
+            .map(e -> classesRepository.findById(e.getClassId()).orElse(null))
+            .toList();
+}
 }

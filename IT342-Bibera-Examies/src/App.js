@@ -5,6 +5,7 @@ import StudentDashboard from "./pages/StudentDashboard";
 import TeacherDashboard from "./pages/TeacherDashboard";
 import CreateExam from "./pages/CreateExam";
 import CreateClass from "./pages/Createclass";
+import ExamAttempt from "./pages/ExamAttempt";
 import AnimatedBackground from "./pages/AnimatedBackground";
 import { Toaster } from "sonner";
 import { AuthProvider } from "./contexts/AuthContext";
@@ -22,10 +23,13 @@ function App() {
             <Route path="/" element={<ExamFlowAuth />} />
 
             {/* The Student Dashboard Page */}
-            <Route path="/dashboard" element={<StudentDashboard />} />
+            <Route path="/student-dashboard" element={<StudentDashboard />} />
             <Route path="/teacher-dashboard" element={<TeacherDashboard />} />
             <Route path="/create-exam" element={<CreateExam />} />
+            <Route path="/edit-exam/:id" element={<CreateExam />} />
             <Route path="/create-class" element={<CreateClass />} />
+            <Route path="/exam/:examId" element={<ExamAttempt />} />
+
           </Routes>
 
           <Toaster position="top-right" richColors />

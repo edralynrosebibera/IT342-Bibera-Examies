@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import "../assets/styles/CreateExam.css";
 import "../assets/styles/StudentDashboard.css";
 
@@ -18,6 +20,20 @@ const CreateExam = () => {
 
   const [activeQuestion, setActiveQuestion] = useState(1);
   const navigate = useNavigate();
+
+  const { id } = useParams();     
+  const isEditMode = !!id;         
+
+
+  const { user } = useAuth();
+
+  const [classes, setClasses] = useState([]);
+  const [selectedClass, setSelectedClass] = useState("");
+  const [dueDate, setDueDate] = useState("");
+
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [timeLimit, setTimeLimit] = useState("");
 
   const activeQ = questions.find(q => q.id === activeQuestion);
 
@@ -111,13 +127,125 @@ const CreateExam = () => {
     updateQuestion("answer", optionText);
   };
 
-  const handlePostExam = () => {
-    console.log("POST EXAM:", questions);
+// ONLY showing modified part (handlePostExam)
+
+  const handlePostExam = async () => {
+    try {
+      const userRes = await fetch(
+        `http://localhost:8080/api/auth/me?email=${user.email}`
+      );
+      const userData = await userRes.json();
+
+      if (!selectedClass || !title || !timeLimit) {
+        alert("Please fill all required fields");
+        return;
+      }
+
+      const url = isEditMode
+        ? `http://localhost:8080/api/exams/${id}`
+        : "http://localhost:8080/api/exams";
+
+      const method = isEditMode ? "PUT" : "POST";
+
+      const res = await fetch(url, {
+        method: method,
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          instructorId: userData.id,
+          classId: selectedClass,
+          title: title,
+          description: description,
+          timeLimit: timeLimit,
+          dueDate: dueDate,
+          questions: questions.map(q => ({
+            questionText: q.text,
+            questionType: q.type,
+            correctAnswer: q.answer,
+            points: q.points,
+            options: q.options.map(opt => ({
+              optionText: opt
+            }))
+          })) 
+        })
+      });
+      if (!res.ok) {
+        const err = await res.text();
+        console.error("POST ERROR:", err);
+        alert("Failed to post exam");
+        return;
+      }
+
+      console.log("SUCCESS POST");
+
+      navigate("/teacher-dashboard");
+
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const handleBack = () => {
-    navigate("/teacher-dashboard");
-  };
+  navigate("/teacher-dashboard");
+};
+
+  /* 🔥 ADD IT HERE */
+  useEffect(() => {
+    const fetchClasses = async () => {
+      try {
+        const userRes = await fetch(
+          `http://localhost:8080/api/auth/me?email=${user.email}`
+        );
+        const userData = await userRes.json();
+
+        const res = await fetch(
+          `http://localhost:8080/api/classes/instructor/${userData.id}`
+        );
+        const data = await res.json();
+
+        setClasses(data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    if (user) fetchClasses();
+  }, [user]);
+
+
+  useEffect(() => {
+    if (!isEditMode) return;
+
+      const fetchExam = async () => {
+        try {
+          const res = await fetch(`http://localhost:8080/api/exams/${id}`);
+          const data = await res.json();
+
+          setTitle(data.title);
+          setDescription(data.description);
+          setTimeLimit(data.timeLimit);
+          setDueDate(data.dueDate);
+          setSelectedClass(data.classId);
+
+          const mappedQuestions = data.questions.map((q, index) => ({
+            id: index + 1,
+            text: q.questionText,
+            type: q.questionType,
+            answer: q.correctAnswer,
+            points: q.points,
+            options: q.options?.map(opt => opt.optionText) || []
+          }));
+
+          setQuestions(mappedQuestions);
+
+        } catch (error) {
+          console.error(error);
+        }
+      };
+
+      fetchExam();
+    }, [id, isEditMode]);
 
   return (
     <div className="dashboard-page">
@@ -155,17 +283,44 @@ const CreateExam = () => {
 
               <div className="input-group">
                 <label>Exam Title</label>
-                <input type="text" />
+                <input 
+                  type="text" 
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                />
               </div>
 
               <div className="input-group">
                 <label>Description</label>
-                <textarea rows="2"></textarea>
+                <textarea 
+                  rows="2"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                ></textarea>
               </div>
 
               <div className="input-group">
                 <label>Time Limit</label>
-                <input type="number" />
+                <input 
+                  type="number"
+                  value={timeLimit}
+                  onChange={(e) => setTimeLimit(e.target.value)}
+                />
+              </div>
+
+              <div className="input-group">
+                <label>Assign Class</label>
+                <select onChange={(e) => setSelectedClass(e.target.value)}>
+                  <option>Select Class</option>
+                  {classes.map(c => (
+                    <option key={c.id} value={c.id}>{c.className}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="input-group">
+                <label>Due Date</label>
+                <input type="datetime-local" onChange={(e) => setDueDate(e.target.value)} />
               </div>
             </div>
 

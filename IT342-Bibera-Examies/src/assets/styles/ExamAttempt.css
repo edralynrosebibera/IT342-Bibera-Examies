@@ -1,0 +1,168 @@
+/* CONTAINER */
+.exam-container {
+  padding: 0;
+}
+
+/* HEADER */
+.exam-navbar {
+  padding: 15px 30px;
+  border-bottom: 1px solid #eee;
+}
+
+/* RIGHT SIDE */
+.exam-nav-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* TIMER */
+.exam-timer {
+  background: #7b61ff;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* 🔥 CENTER EVERYTHING */
+.exam-wrapper {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+/* MAIN BODY */
+.exam-body {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 25px;
+
+  width: 100%;
+  max-width: 1100px; /* 🔥 controls centering width */
+  padding: 20px;
+}
+
+/* PANELS */
+.question-panel,
+.sidebar-panel {
+  background: white;
+  border-radius: 20px;
+  padding: 25px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+
+  height: fit-content;
+}
+
+/* QUESTION HEADER */
+.question-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+.question-number {
+  font-weight: 700;
+}
+
+.question-points {
+  color: #7b61ff;
+  font-size: 14px;
+}
+
+/* QUESTION */
+.question-content {
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  background: #f9f9f9;
+}
+
+/* OPTIONS */
+.options-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.option {
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #eee;
+  cursor: pointer;
+  background: #fafafa;
+}
+
+.option:hover {
+  background: #eef2ff;
+}
+
+/* BUTTONS */
+.controls {
+  display: flex;
+  justify-content: space-between;
+}
+
+.primary-btn {
+  background: #7b61ff;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.secondary-btn {
+  background: #eef2ff;
+  color: #7b61ff;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* SIDEBAR */
+.timer-box {
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+/* NAV GRID */
+.nav-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.nav-box {
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #eee;
+  background: #fafafa;
+  cursor: pointer;
+}
+
+.nav-box:hover {
+  background: #eef2ff;
+}
+
+/* PROGRESS */
+.progress-section p {
+  margin-bottom: 10px;
+}
+
+.progress-bar {
+  height: 10px;
+  background: #eee;
+  border-radius: 10px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #7b61ff;
+}

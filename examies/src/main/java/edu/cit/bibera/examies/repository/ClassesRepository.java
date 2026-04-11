@@ -8,4 +8,5 @@ import java.util.List;
 public interface ClassesRepository extends JpaRepository<ClassesEntity, Long> {
 
     List<ClassesEntity> findByInstructorId(Long instructorId);
+    ClassesEntity findByClassPassword(String classPassword);
 }

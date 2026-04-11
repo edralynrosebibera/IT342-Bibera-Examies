@@ -16,11 +16,13 @@ public class SecurityConfig {
 
         http
             .csrf(csrf -> csrf.disable())
-            .cors(cors -> {}) 
+            .cors(cors -> cors.configurationSource(corsConfigurationSource())) // 🔥 FIXED
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll()
                 .anyRequest().permitAll()
-            );
+            )
+            .formLogin(form -> form.disable()) // 🔥 VERY IMPORTANT
+            .httpBasic(basic -> basic.disable()); // 🔥 VERY IMPORTANT
 
         return http.build();
     }
