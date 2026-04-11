@@ -1,16 +1,22 @@
 package edu.cit.bibera.examies.service;
 
+import edu.cit.bibera.examies.entity.AttemptEntity;
 import edu.cit.bibera.examies.entity.ExamEntity;
 import edu.cit.bibera.examies.entity.QuestionEntity;
 import edu.cit.bibera.examies.entity.QuestionOptionEntity;
 import edu.cit.bibera.examies.repository.ExamRepository;
 import edu.cit.bibera.examies.repository.QuestionOptionRepository;
+import edu.cit.bibera.examies.repository.AttemptRepository;
 import edu.cit.bibera.examies.repository.QuestionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -19,6 +25,8 @@ public class ExamService {
     private final ExamRepository examRepository;
     private final QuestionRepository questionRepo;
     private final QuestionOptionRepository optionRepo;
+
+    private final AttemptRepository attemptRepository;
 
     // ✅ SIMPLE EXAM CREATE (not used for full exam)
     public ExamEntity createExam(ExamEntity exam) {
@@ -103,6 +111,38 @@ public class ExamService {
 
     public ExamEntity getExamById(Long id) {
     return examRepository.findById(id).orElseThrow();
+}
+
+public List<Map<String, Object>> getStudentExams(Long studentId) {
+
+    List<ExamEntity> exams = examRepository.findAll();
+    List<Map<String, Object>> result = new ArrayList<>();
+
+    for (ExamEntity exam : exams) {
+
+        Map<String, Object> map = new HashMap<>();
+
+        map.put("id", exam.getId());
+        map.put("title", exam.getTitle());
+        map.put("started", exam.isStarted());
+        map.put("closed", exam.isClosed());
+
+        Optional<AttemptEntity> attempt =
+            attemptRepository.findByExamIdAndStudentId(
+                exam.getId(), studentId
+            );
+
+        if (attempt.isPresent() &&
+            "COMPLETED".equals(attempt.get().getStatus())) {
+
+            map.put("score", attempt.get().getScore());
+            map.put("total", attempt.get().getTotal());
+        }
+
+        result.add(map);
+    }
+
+    return result;
 }
 
 }

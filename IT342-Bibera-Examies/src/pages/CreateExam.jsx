@@ -225,7 +225,7 @@ const CreateExam = () => {
           setTitle(data.title);
           setDescription(data.description);
           setTimeLimit(data.timeLimit);
-          setDueDate(data.dueDate);
+          setDueDate(data.dueDate?.slice(0, 16));
           setSelectedClass(data.classId);
 
           const mappedQuestions = data.questions.map((q, index) => ({
@@ -262,16 +262,16 @@ const CreateExam = () => {
             ← Back
           </button>
 
-          <button className="header-btn primary" onClick={handlePostExam}>
-            Post Exam
-          </button>
+        <button className="header-btn primary" onClick={handlePostExam}>
+          {isEditMode ? "Update Exam" : "Post Exam"}
+        </button>
         </div>
       </nav>
 
       <div className="dashboard-content">
 
         <header className="welcome-section">
-          <h1>Create Exam</h1>
+          <h1>{isEditMode ? "Edit Exam" : "Create Exam"}</h1>
         </header>
 
         <div className="main-content">
@@ -310,7 +310,10 @@ const CreateExam = () => {
 
               <div className="input-group">
                 <label>Assign Class</label>
-                <select onChange={(e) => setSelectedClass(e.target.value)}>
+                <select 
+                  value={selectedClass}
+                  onChange={(e) => setSelectedClass(e.target.value)}
+                >                
                   <option>Select Class</option>
                   {classes.map(c => (
                     <option key={c.id} value={c.id}>{c.className}</option>
@@ -320,7 +323,11 @@ const CreateExam = () => {
 
               <div className="input-group">
                 <label>Due Date</label>
-                <input type="datetime-local" onChange={(e) => setDueDate(e.target.value)} />
+                <input 
+                  type="datetime-local" 
+                  value={dueDate}
+                  onChange={(e) => setDueDate(e.target.value)} 
+                />
               </div>
             </div>
 

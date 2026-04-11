@@ -11,6 +11,7 @@ const TeacherDashboard = () => {
   const [filter, setFilter] = useState('All');
   const [showDropdown, setShowDropdown] = useState(false);
   const [exams, setExams] = useState([]);
+  const [search, setSearch] = useState("");
 
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
@@ -114,7 +115,6 @@ const TeacherDashboard = () => {
             <div className="icon-box purple-bg">📄</div>
             <div className="text-box">
               <span className="label">Total Exams</span>
-              <span className="count">6</span>
             </div>
           </button>
 
@@ -122,7 +122,6 @@ const TeacherDashboard = () => {
             <div className="icon-box green-bg">✔️</div>
             <div className="text-box">
               <span className="label">Completed</span>
-              <span className="count">3</span>
             </div>
           </button>
 
@@ -130,7 +129,6 @@ const TeacherDashboard = () => {
             <div className="icon-box pink-bg">⏰</div>
             <div className="text-box">
               <span className="label">Upcoming</span>
-              <span className="count">3</span>
             </div>
           </button>
 
@@ -141,7 +139,6 @@ const TeacherDashboard = () => {
             <div className="icon-box blue-bg">🎓</div>
             <div className="text-box">
               <span className="label">Classes</span>
-              <span className="count">4</span>
             </div>
           </button>
         </div>
@@ -150,7 +147,12 @@ const TeacherDashboard = () => {
         <div className="search-section">
           <div className="search-wrapper">
             <span className="search-icon">🔍</span>
-            <input type="text" placeholder="Search exams..." />
+            <input 
+              type="text" 
+              placeholder="Search exams..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
           </div>
 
           <div style={{ display: "flex", gap: "10px" }}>
@@ -176,7 +178,13 @@ const TeacherDashboard = () => {
           {filter === "Classes" ? (
             <ClassesView />
           ) : (
-            Array.isArray(exams) && exams.map(exam => (
+            Array.isArray(exams) && exams
+              .filter(exam => {
+                if (filter === "Completed") return exam.closed === true;
+                if (filter === "Upcoming") return exam.closed === false;
+                return true; // All
+              })
+                  .map(exam => (
               <ExamCard key={exam.id} exam={exam} refreshExams={fetchExams} />
             ))
           )}
