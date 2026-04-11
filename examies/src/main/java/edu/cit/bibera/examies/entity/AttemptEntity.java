@@ -26,5 +26,6 @@ public class AttemptEntity {
 
     private Integer score;
 
-    private String status; // ONGOING, COMPLETED
+    private String status; 
+    private Integer total;
 }

@@ -11,6 +11,7 @@ const StudentDashboard = () => {
   const [filter, setFilter] = useState('All');
   const [showDropdown, setShowDropdown] = useState(false);
   const [exams, setExams] = useState([]);
+  const [search, setSearch] = useState("");
 
   // 🔥 NEW STATES
   const [classPassword, setClassPassword] = useState("");
@@ -171,7 +172,6 @@ const StudentDashboard = () => {
             <div className="icon-box purple-bg">📄</div>
             <div className="text-box">
               <span className="label">Total Exams</span>
-              <span className="count">6</span>
             </div>
           </button>
 
@@ -182,7 +182,6 @@ const StudentDashboard = () => {
             <div className="icon-box green-bg">✔️</div>
             <div className="text-box">
               <span className="label">Completed</span>
-              <span className="count">3</span>
             </div>
           </button>
 
@@ -193,7 +192,6 @@ const StudentDashboard = () => {
             <div className="icon-box pink-bg">⏰</div>
             <div className="text-box">
               <span className="label">Upcoming</span>
-              <span className="count">3</span>
             </div>
           </button>
 
@@ -204,7 +202,6 @@ const StudentDashboard = () => {
           <div className="icon-box blue-bg">🎓</div>
           <div className="text-box">
             <span className="label">Classes</span>
-            <span className="count">--</span>
           </div>
 
         </button>
@@ -216,7 +213,12 @@ const StudentDashboard = () => {
 
           <div className="search-wrapper">
             <span className="search-icon">🔍</span>
-            <input type="text" placeholder="Search exams..." />
+            <input 
+              type="text" 
+              placeholder="Search exams..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
           </div>
 
           <div style={{ display: "flex", gap: "8px", marginTop: "-30px"}}>
@@ -242,7 +244,19 @@ const StudentDashboard = () => {
           {filter === "Classes" ? (
             <StudentClassesView />
           ) : (
-            exams.map(exam => (
+            exams
+              .filter(exam => {
+                // 🔍 search
+                const matchSearch =
+                  exam.title.toLowerCase().includes(search.toLowerCase());
+
+                // 🎯 filter logic
+                if (filter === "Completed") return exam.closed === true && matchSearch;
+                if (filter === "Upcoming") return exam.started === false && matchSearch;
+
+                return matchSearch; // All
+              })
+              .map(exam => (
               <ExamCard key={exam.id} exam={exam} />
             ))
           )}
