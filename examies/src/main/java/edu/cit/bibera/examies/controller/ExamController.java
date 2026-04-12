@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 @RestController
 @RequestMapping("/api/exams") // 🔥 THIS IS WHAT YOU NEED
@@ -56,7 +58,14 @@ public class ExamController {
     }   
 
     @GetMapping("/{id}")
-public ExamEntity getExamById(@PathVariable Long id) {
-    return examService.getExamById(id);
-}
+    public ExamEntity getExamById(@PathVariable Long id) {
+        return examService.getExamById(id);
+    }
+
+    @GetMapping("/student/{studentId}")
+    public List<Map<String, Object>> getStudentExams(@PathVariable Long studentId) {
+        return examService.getStudentExams(studentId);
+    }
+
+    
 }

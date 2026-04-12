@@ -42,22 +42,14 @@ const StudentDashboard = () => {
         );
         const userData = await userRes.json();
 
-        const classRes = await fetch(
-          `http://localhost:8080/api/classes/student/${userData.id}`
+        const res = await fetch(
+          `http://localhost:8080/api/exams/student/${userData.id}`
         );
-        const classes = await classRes.json();
 
-        let allExams = [];
+        const data = await res.json();
+        console.log("STUDENT EXAMS:", data);
 
-        for (let cls of classes) {
-          const res = await fetch(
-            `http://localhost:8080/api/exams/class/${cls.id}`
-          );
-          const exams = await res.json();
-          allExams = [...allExams, ...exams];
-        }
-
-        setExams(allExams);
+        setExams(data);
 
       } catch (error) {
         console.error(error);
@@ -66,9 +58,6 @@ const StudentDashboard = () => {
 
     if (user) fetchExams();
   }, [user]);
-
-
-
 
 
   // 🔥 WORKING LOGOUT
@@ -244,19 +233,17 @@ const StudentDashboard = () => {
           {filter === "Classes" ? (
             <StudentClassesView />
           ) : (
-            exams
-              .filter(exam => {
-                // 🔍 search
-                const matchSearch =
-                  exam.title.toLowerCase().includes(search.toLowerCase());
+          (Array.isArray(exams) ? exams : [])
+            .filter(exam => {
+              const matchSearch =
+                exam.title.toLowerCase().includes(search.toLowerCase());
 
-                // 🎯 filter logic
-                if (filter === "Completed") return exam.closed === true && matchSearch;
-                if (filter === "Upcoming") return exam.started === false && matchSearch;
+              if (filter === "Completed") return exam.score !== undefined && matchSearch;
+              if (filter === "Upcoming") return exam.started === false && matchSearch;
 
-                return matchSearch; // All
-              })
-              .map(exam => (
+              return matchSearch;
+            })
+            .map(exam => (
               <ExamCard key={exam.id} exam={exam} />
             ))
           )}

@@ -45,6 +45,12 @@ const ExamAttempt = () => {
       );
 
       const data = await res.json();
+
+      if (data.status === "COMPLETED") {
+        alert("You already submitted this exam");
+        navigate("/student-dashboard");
+        return;
+      }
       setAttemptId(data.id);
     };
 

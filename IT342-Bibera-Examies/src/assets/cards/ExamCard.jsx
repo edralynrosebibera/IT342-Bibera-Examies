@@ -94,14 +94,14 @@ const ExamCard = ({ exam, refreshExams }) => {
           <span>📚 {exam.questions?.length || 0} questions</span>
         </div>
 
-        {/* BUTTON LOGIC */}
-        {exam.closed ? (
+      {/* BUTTON LOGIC */}
+      {role === "teacher" ? (
+
+        exam.closed ? (
           <button className="action-btn secondary">
             Closed
           </button>
-
-        ) : role === "teacher" ? (
-
+        ) : (
           <>
             {exam.started ? (
               <button 
@@ -135,24 +135,35 @@ const ExamCard = ({ exam, refreshExams }) => {
               </button>
             </div>
           </>
+        )
 
-        ) : (
+      ) : (
 
-          exam.started ? (
-            <button 
-              className="action-btn primary"
-              onClick={handleStartExam}
-            >
-              Start Exam
-            </button>
-          ) : (
+        // 🎯 STUDENT LOGIC
+        exam.score !== undefined ? (
+          <div>
             <button className="action-btn secondary">
-              Not Available
+              Closed
             </button>
-          )
+            <p style={{ marginTop: "8px", fontWeight: "bold" }}>
+              Score: {exam.score} / {exam.total}
+            </p>
+          </div>
 
-        )}
+        ) : exam.started ? (
+          <button 
+            className="action-btn primary"
+            onClick={handleStartExam}
+          >
+            Start Exam
+          </button>
+        ) : (
+          <button className="action-btn secondary">
+            Not Available
+          </button>
+        )
 
+      )}
       </div>
 
       {/* 🔥 MODAL */}
