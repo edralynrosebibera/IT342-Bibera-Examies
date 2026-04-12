@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -17,17 +18,27 @@ public class AttemptService {
 
     public AttemptEntity startAttempt(Long examId, Long studentId) {
 
-        return attemptRepo.findByExamIdAndStudentId(examId, studentId)
-                .orElseGet(() -> {
-                    AttemptEntity attempt = AttemptEntity.builder()
-                            .examId(examId)
-                            .studentId(studentId)
-                            .startTime(LocalDateTime.now())
-                            .status("ONGOING")
-                            .build();
+        List<AttemptEntity> existing =
+            attemptRepo.findByExamIdAndStudentId(examId, studentId);
 
-                    return attemptRepo.save(attempt);
-                });
+        // 🚫 If already completed → return latest attempt
+        if (!existing.isEmpty()) {
+            AttemptEntity latest = existing.get(existing.size() - 1);
+
+            if ("COMPLETED".equals(latest.getStatus())) {
+                return latest;
+            }
+        }
+
+        // ✅ If not existing → create new
+        AttemptEntity attempt = AttemptEntity.builder()
+                .examId(examId)
+                .studentId(studentId)
+                .startTime(LocalDateTime.now())
+                .status("ONGOING")
+                .build();
+
+        return attemptRepo.save(attempt);
     }
 
     public AttemptAnswerEntity saveAnswer(AttemptAnswerEntity request) {
@@ -38,7 +49,7 @@ public class AttemptService {
                 .textAnswer(request.getTextAnswer())
                 .selectedOption(request.getSelectedOption())
                 .uploadFileUrl(request.getUploadFileUrl())
-                .isCorrect(false)
+                .isCorrect(true)
                 .build();
 
         return answerRepo.save(ans);
@@ -52,6 +63,19 @@ public class AttemptService {
 
         AttemptEntity attempt = attemptRepo.findById(attemptId).orElseThrow();
 
+        List<AttemptAnswerEntity> answers = answerRepo.findByAttemptId(attemptId);
+
+        int score = 0;
+        int total = answers.size();
+
+        for (AttemptAnswerEntity ans : answers) {
+            if (Boolean.TRUE.equals(ans.getIsCorrect())) {
+                score++;
+            }
+        }
+
+        attempt.setScore(score);
+        attempt.setTotal(total);
         attempt.setSubmittedAt(LocalDateTime.now());
         attempt.setStatus("COMPLETED");
 

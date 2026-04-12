@@ -127,16 +127,18 @@ public List<Map<String, Object>> getStudentExams(Long studentId) {
         map.put("started", exam.isStarted());
         map.put("closed", exam.isClosed());
 
-        Optional<AttemptEntity> attempt =
+        List<AttemptEntity> attempts =
             attemptRepository.findByExamIdAndStudentId(
                 exam.getId(), studentId
             );
 
-        if (attempt.isPresent() &&
-            "COMPLETED".equals(attempt.get().getStatus())) {
+        if (!attempts.isEmpty()) {
+            AttemptEntity latest = attempts.get(attempts.size() - 1);
 
-            map.put("score", attempt.get().getScore());
-            map.put("total", attempt.get().getTotal());
+            if ("COMPLETED".equals(latest.getStatus())) {
+                map.put("score", latest.getScore());
+                map.put("total", latest.getTotal());
+            }
         }
 
         result.add(map);
@@ -144,5 +146,4 @@ public List<Map<String, Object>> getStudentExams(Long studentId) {
 
     return result;
 }
-
 }
