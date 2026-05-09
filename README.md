@@ -366,5 +366,5 @@ Existing test documentation:
 - **Course:** IT342 - System Integration and Architecture
 - **Project:** Examies
 - **Group:** G1
-- **Developer:** Bibera
+- **Developer:** Edralyn Bibera
 - **Status:** In active development
