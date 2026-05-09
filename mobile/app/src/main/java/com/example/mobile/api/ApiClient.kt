@@ -1,4 +1,4 @@
-package com.example.mobile.api
+package com.example.mobile.common.api
 
 object ApiClient {
 //    const val BASE_URL = "http://192.168.1.5:8080/api/auth/"

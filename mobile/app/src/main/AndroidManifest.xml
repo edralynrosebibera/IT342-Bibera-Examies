@@ -17,7 +17,7 @@
 
         <!-- LOGIN SCREEN -->
         <activity
-            android:name=".AuthActivity"
+            android:name=".features.auth.AuthActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -26,10 +26,10 @@
         </activity>
 
         <!-- SIGNUP FLOW -->
-        <activity android:name=".SignupActivity"/>
+        <activity android:name=".features.auth.SignupActivity"/>
 
         <!-- DASHBOARD -->
-        <activity android:name=".DashboardActivity"/>
+        <activity android:name=".features.dashboard.DashboardActivity"/>
 
     </application>
 

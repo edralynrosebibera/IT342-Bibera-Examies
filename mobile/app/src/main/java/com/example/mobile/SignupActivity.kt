@@ -1,4 +1,4 @@
-package com.example.mobile
+package com.example.mobile.features.auth
 
 import android.content.Intent
 import android.os.Bundle
@@ -7,7 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
-import com.example.mobile.api.ApiClient
+import com.example.mobile.common.api.ApiClient
 import org.json.JSONObject
 
 class SignupActivity : AppCompatActivity() {

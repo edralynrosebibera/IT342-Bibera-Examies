@@ -1,4 +1,4 @@
-package com.example.mobile.api
+package com.example.mobile.common.session
 
 import android.content.Context
 

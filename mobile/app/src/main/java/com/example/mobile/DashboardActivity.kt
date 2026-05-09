@@ -1,11 +1,12 @@
-package com.example.mobile
+package com.example.mobile.features.dashboard
 
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import com.example.mobile.api.SessionManager
+import com.example.mobile.common.session.SessionManager
+import com.example.mobile.features.auth.AuthActivity
 
 class DashboardActivity : AppCompatActivity() {
 
