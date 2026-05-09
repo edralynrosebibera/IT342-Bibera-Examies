@@ -24,9 +24,9 @@ public class ExamController {
     }
 
     // ✅ GET TEACHER EXAMS
-    @GetMapping("/teacher/{instructorId}")
-    public List<ExamEntity> getTeacherExams(@PathVariable Long instructorId) {
-        return examService.getTeacherExams(instructorId);
+    @GetMapping("/teacher/{supabaseUserId}")
+    public List<ExamEntity> getTeacherExams(@PathVariable String supabaseUserId) {
+        return examService.getTeacherExams(supabaseUserId);
     }
 
     // ✅ GET CLASS EXAMS
@@ -62,9 +62,9 @@ public class ExamController {
         return examService.getExamById(id);
     }
 
-    @GetMapping("/student/{studentId}")
-    public List<Map<String, Object>> getStudentExams(@PathVariable Long studentId) {
-        return examService.getStudentExams(studentId);
+    @GetMapping("/student/{supabaseUserId}")
+    public List<Map<String, Object>> getStudentExams(@PathVariable String supabaseUserId) {
+        return examService.getStudentExams(supabaseUserId);
     }
 
     

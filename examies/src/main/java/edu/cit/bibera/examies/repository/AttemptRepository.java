@@ -8,4 +8,5 @@ import java.util.Optional;
 
 public interface AttemptRepository extends JpaRepository<AttemptEntity, Long> {
     List<AttemptEntity> findByExamIdAndStudentId(Long examId, Long studentId);
+    List<AttemptEntity> findByExamId(Long examId);
 }

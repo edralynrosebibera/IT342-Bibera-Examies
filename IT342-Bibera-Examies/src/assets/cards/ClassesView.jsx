@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import ClassesCard from "./ClassesCard";
 import { useAuth } from "../../contexts/AuthContext";
 
@@ -6,24 +7,19 @@ const ClassesView = () => {
 
   const [classes, setClasses] = useState([]);
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
 
     const fetchClasses = async () => {
       try {
-        // 🔥 Get teacher info
-        const userRes = await fetch(
-          `http://localhost:8080/api/auth/me?email=${user.email}`
-        );
-        const userData = await userRes.json();
-
         // 🔥 Get classes
         const res = await fetch(
-          `http://localhost:8080/api/classes/instructor/${userData.id}`
+          `http://localhost:8080/api/classes/instructor/${user.id}`
         );
         const data = await res.json();
 
-      setClasses(Array.isArray(data) ? data : []);
+        setClasses(data);
 
       } catch (error) {
         console.error(error);
@@ -40,10 +36,12 @@ const ClassesView = () => {
         <ClassesCard
           key={c.id}
           classItem={{
+            id: c.id,
             title: c.className,
             description: "Class",
-            students: 0,
-            exams: 0
+            students: c.studentCount ?? 0,
+            exams: c.examCount ?? 0,
+            onViewStudents: () => navigate(`/analytics/${c.id}`)
           }}
         />
       ))}

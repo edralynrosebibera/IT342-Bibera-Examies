@@ -34,13 +34,8 @@ const ExamAttempt = () => {
     const startAttempt = async () => {
       console.log("USER:", user);
 
-      const userRes = await fetch(
-        `http://localhost:8080/api/auth/me?email=${user.email}`
-      );
-      const userData = await userRes.json();
-
       const res = await fetch(
-        `http://localhost:8080/api/attempts/start?examId=${examId}&studentId=${userData.id}`,
+        `http://localhost:8080/api/attempts/start?examId=${examId}&studentId=${user.id}`,
         { method: "POST" }
       );
 

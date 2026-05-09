@@ -6,7 +6,11 @@ import TeacherDashboard from "./pages/TeacherDashboard";
 import CreateExam from "./pages/CreateExam";
 import CreateClass from "./pages/Createclass";
 import ExamAttempt from "./pages/ExamAttempt";
+import ProfileDashboard from "./pages/ProfileDashboard";
 import AnimatedBackground from "./pages/AnimatedBackground";
+import AdminDashboard from "./pages/AdminDashboard";
+import Analytics from "./pages/Analytics";
+import ViewStudentAnswers from "./pages/ViewStudentAnswers";
 import { Toaster } from "sonner";
 import { AuthProvider } from "./contexts/AuthContext";
 import "./App.css";
@@ -29,6 +33,10 @@ function App() {
             <Route path="/edit-exam/:id" element={<CreateExam />} />
             <Route path="/create-class" element={<CreateClass />} />
             <Route path="/exam/:examId" element={<ExamAttempt />} />
+            <Route path="/profile" element={<ProfileDashboard />} />
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/analytics/:classId" element={<Analytics />} />
+            <Route path="/view-answers/:classId/:examId/:studentId/:attemptId" element={<ViewStudentAnswers />} />
 
           </Routes>
 

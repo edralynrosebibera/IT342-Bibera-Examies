@@ -212,4 +212,31 @@ public class AuthService {
 
         return ResponseEntity.ok(userOpt.get());
     }
+
+    @Transactional
+    public ResponseEntity<?> updateUserProfile(String email, UpdateProfileRequest request) {
+        Optional<Users> userOpt = usersRepository.findByEmail(email);
+
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.status(404).body("User not found");
+        }
+
+        Users user = userOpt.get();
+
+        if (request.getFirstName() != null && !request.getFirstName().isEmpty()) {
+            user.setFirstName(request.getFirstName());
+        }
+
+        if (request.getLastName() != null && !request.getLastName().isEmpty()) {
+            user.setLastName(request.getLastName());
+        }
+
+        if (request.getPhoneNumber() != null) {
+            user.setPhoneNumber(request.getPhoneNumber());
+        }
+
+        Users updatedUser = usersRepository.save(user);
+
+        return ResponseEntity.ok(updatedUser);
+    }
 }

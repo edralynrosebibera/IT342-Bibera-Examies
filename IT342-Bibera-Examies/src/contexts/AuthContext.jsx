@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { auth } from '../lib/supabase'
+import { auth, supabase } from '../lib/supabase'
 
 const AuthContext = createContext({})
 
@@ -17,8 +17,8 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     // Get initial session
-    auth.getCurrentUser().then(({ data: { user } }) => {
-      setUser(user)
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null)
       setLoading(false)
     })
 

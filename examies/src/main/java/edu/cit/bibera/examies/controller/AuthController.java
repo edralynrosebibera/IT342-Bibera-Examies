@@ -3,6 +3,7 @@ package edu.cit.bibera.examies.controller;
 import edu.cit.bibera.examies.dto.AuthRequest;
 import edu.cit.bibera.examies.dto.AuthResponse;
 import edu.cit.bibera.examies.dto.SignUpRequest;
+import edu.cit.bibera.examies.dto.UpdateProfileRequest;
 import edu.cit.bibera.examies.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -49,6 +50,15 @@ public class AuthController {
     public ResponseEntity<?> getCurrentUser(@RequestParam String email) {
         try {
             return authService.getUserByEmail(email);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PutMapping("/update-profile")
+    public ResponseEntity<?> updateProfile(@RequestParam String email, @RequestBody UpdateProfileRequest request) {
+        try {
+            return authService.updateUserProfile(email, request);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

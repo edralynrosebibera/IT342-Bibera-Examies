@@ -1,5 +1,6 @@
 package edu.cit.bibera.examies.controller;
 
+import edu.cit.bibera.examies.dto.QuestionOptionResponse;
 import edu.cit.bibera.examies.dto.QuestionResponse;
 import edu.cit.bibera.examies.entity.QuestionEntity;
 import edu.cit.bibera.examies.repository.QuestionOptionRepository;
@@ -26,9 +27,13 @@ public class QuestionController {
 
         return questions.stream().map(q -> {
 
-            List<String> options = optionRepo.findByQuestionId(q.getId())
+            List<QuestionOptionResponse> options = optionRepo.findByQuestionId(q.getId())
                     .stream()
-                    .map(opt -> opt.getOptionText())
+                    .map(opt -> QuestionOptionResponse.builder()
+                            .id(opt.getId())
+                            .optionText(opt.getOptionText())
+                            .isCorrect(opt.getIsCorrect())
+                            .build())
                     .toList();
 
             return QuestionResponse.builder()

@@ -22,13 +22,18 @@ public class ClassesController {
         return ResponseEntity.ok(classesService.createClass(request));
     }
 
-    @GetMapping("/instructor/{id}")
-    public ResponseEntity<List<ClassesEntity>> getClassesByInstructor(@PathVariable Long id) {
-        return ResponseEntity.ok(classesService.getClassesByInstructor(id));
+    @GetMapping("/instructor/{supabaseUserId}")
+    public ResponseEntity<List<ClassesEntity>> getClassesByInstructor(@PathVariable String supabaseUserId) {
+        return ResponseEntity.ok(classesService.getClassesByInstructor(supabaseUserId));
     }
 
-    @GetMapping("/student/{id}")
-    public ResponseEntity<List<ClassesEntity>> getClassesByStudent(@PathVariable Long id) {
-        return ResponseEntity.ok(classesService.getClassesByStudent(id));
+    @GetMapping("/student/{supabaseUserId}")
+    public ResponseEntity<List<ClassesEntity>> getClassesByStudent(@PathVariable String supabaseUserId) {
+        return ResponseEntity.ok(classesService.getClassesByStudent(supabaseUserId));
+    }
+
+    @GetMapping("/{classId}")
+    public ResponseEntity<ClassesEntity> getClassById(@PathVariable Long classId) {
+        return ResponseEntity.ok(classesService.getClassById(classId));
     }
 }

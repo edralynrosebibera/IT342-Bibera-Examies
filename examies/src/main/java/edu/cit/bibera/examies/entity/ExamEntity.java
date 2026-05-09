@@ -18,7 +18,7 @@ public class ExamEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long instructorId;
+    private String instructorId;
 
     private Long classId;
 

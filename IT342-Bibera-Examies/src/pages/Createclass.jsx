@@ -27,12 +27,6 @@ const CreateClass = () => {
 
   const handleSubmit = async () => {
     try {
-      // 🔥 Get teacher from backend
-      const userRes = await fetch(
-        `http://localhost:8080/api/auth/me?email=${user.email}`
-      );
-      const userData = await userRes.json();
-
       // 🔥 Create class
       await fetch("http://localhost:8080/api/classes", {
         method: "POST",
@@ -40,7 +34,7 @@ const CreateClass = () => {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          instructorId: userData.id,
+          instructorId: user.id,
           className: form.title,
           classPassword: form.password
         })
