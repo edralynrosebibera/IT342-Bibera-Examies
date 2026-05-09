@@ -36,27 +36,9 @@ const LoginForm = () => {
       if (data.user) {
         toast.success("Login Successful!");
 
-      const res = await fetch(
-        `http://localhost:8080/api/auth/me?email=${data.user.email}`
-      );
+        const role = data.user.user_metadata?.role?.toLowerCase();
 
-      if (!res.ok) {
-        throw new Error("Failed to fetch user role");
-      }
-
-      const userData = await res.json();
-      console.log("userData:", userData);
-
-      const role = userData.role?.toLowerCase();
-
-      await supabase.auth.updateUser({
-        data: { role: role }
-      });
-
-      await supabase.auth.refreshSession();
-
-
-        console.log("Backend role:", role);
+        console.log("Role from Supabase:", role);
 
         if (role === "student") {
           navigate("/student-dashboard");

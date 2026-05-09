@@ -6,7 +6,9 @@ import java.util.List;
 
 public interface ExamRepository extends JpaRepository<ExamEntity, Long> {
 
-    List<ExamEntity> findByInstructorId(Long instructorId);
+    List<ExamEntity> findByInstructorId(String instructorId);
 
     List<ExamEntity> findByClassId(Long classId);
+
+    List<ExamEntity> findByClassIdIn(List<Long> classIds);
 }

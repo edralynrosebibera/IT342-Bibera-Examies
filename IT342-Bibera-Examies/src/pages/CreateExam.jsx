@@ -131,11 +131,6 @@ const CreateExam = () => {
 
   const handlePostExam = async () => {
     try {
-      const userRes = await fetch(
-        `http://localhost:8080/api/auth/me?email=${user.email}`
-      );
-      const userData = await userRes.json();
-
       if (!selectedClass || !title || !timeLimit) {
         alert("Please fill all required fields");
         return;
@@ -153,7 +148,7 @@ const CreateExam = () => {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          instructorId: userData.id,
+          instructorId: user.id,
           classId: selectedClass,
           title: title,
           description: description,
@@ -194,13 +189,8 @@ const CreateExam = () => {
   useEffect(() => {
     const fetchClasses = async () => {
       try {
-        const userRes = await fetch(
-          `http://localhost:8080/api/auth/me?email=${user.email}`
-        );
-        const userData = await userRes.json();
-
         const res = await fetch(
-          `http://localhost:8080/api/classes/instructor/${userData.id}`
+          `http://localhost:8080/api/classes/instructor/${user.id}`
         );
         const data = await res.json();
 

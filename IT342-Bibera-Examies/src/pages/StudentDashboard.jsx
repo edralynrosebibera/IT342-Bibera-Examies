@@ -34,28 +34,23 @@ const StudentDashboard = () => {
   
   , []);
 
+  const fetchExams = async () => {
+    try {
+      const res = await fetch(
+        `http://localhost:8080/api/exams/student/${user.id}`
+      );
+
+      const data = await res.json();
+      console.log("STUDENT EXAMS:", data);
+
+      setExams(data);
+
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
-    const fetchExams = async () => {
-      try {
-        const userRes = await fetch(
-          `http://localhost:8080/api/auth/me?email=${user.email}`
-        );
-        const userData = await userRes.json();
-
-        const res = await fetch(
-          `http://localhost:8080/api/exams/student/${userData.id}`
-        );
-
-        const data = await res.json();
-        console.log("STUDENT EXAMS:", data);
-
-        setExams(data);
-
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
     if (user) fetchExams();
   }, [user]);
 
@@ -67,33 +62,33 @@ const StudentDashboard = () => {
   };
 
   const handleViewProfile = () => {
-    console.log("View Profile clicked");
+    navigate('/profile');
   };
 
   // 🔥 JOIN CLASS FUNCTION
   const handleJoinClass = async () => {
     try {
-      const userRes = await fetch(
-        `http://localhost:8080/api/auth/me?email=${user.email}`
-      );
-      const userData = await userRes.json();
-
-      await fetch("http://localhost:8080/api/enrollments/join", {
+      const joinRes = await fetch("http://localhost:8080/api/enrollments/join", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          studentId: userData.id,
+          studentId: user.id,
           classPassword: classPassword
         })
       });
 
-      console.log("Joined class!");
+      if (!joinRes.ok) {
+        const errText = await joinRes.text();
+        console.error("Join class failed:", errText);
+        alert("Failed to join class");
+        return;
+      }
 
-      
+      console.log("Joined class!");
       setClassPassword("");
-      
+      fetchExams();
 
     } catch (error) {
       console.error(error);
@@ -228,28 +223,27 @@ const StudentDashboard = () => {
         </div>
 
         {/* EXAMS GRID */}
-        <div className="exams-display-grid">
+        
 
-          {filter === "Classes" ? (
-            <StudentClassesView />
-          ) : (
-          (Array.isArray(exams) ? exams : [])
-            .filter(exam => {
-              const matchSearch =
-                exam.title.toLowerCase().includes(search.toLowerCase());
+        {filter === "Classes" ? (
+          <StudentClassesView />
+        ) : (
+          <div className="exams-display-grid">
+            {(Array.isArray(exams) ? exams : [])
+              .filter(exam => {
+                const matchSearch =
+                  exam.title.toLowerCase().includes(search.toLowerCase());
 
-              if (filter === "Completed") return exam.score !== undefined && matchSearch;
-              if (filter === "Upcoming") return exam.started === false && matchSearch;
+                if (filter === "Completed") return exam.score !== undefined && matchSearch;
+                if (filter === "Upcoming") return exam.started === false && matchSearch;
 
-              return matchSearch;
-            })
-            .map(exam => (
-              <ExamCard key={exam.id} exam={exam} />
-            ))
-          )}
-
-        </div>
-
+                return matchSearch;
+              })
+              .map(exam => (
+                <ExamCard key={exam.id} exam={exam} />
+              ))}
+          </div>
+        )}
       </div>
     </div>
   );

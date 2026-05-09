@@ -18,7 +18,7 @@ public class AttemptController {
     @PostMapping("/start")
     public AttemptEntity start(
             @RequestParam Long examId,
-            @RequestParam Long studentId
+            @RequestParam String studentId
     ) {
         return service.startAttempt(examId, studentId);
     }
@@ -32,6 +32,16 @@ public class AttemptController {
     @GetMapping("/{attemptId}")
     public List<AttemptAnswerEntity> getAnswers(@PathVariable Long attemptId) {
         return service.getAnswers(attemptId);
+    }
+
+    @GetMapping("/details/{attemptId}")
+    public AttemptEntity getAttemptDetails(@PathVariable Long attemptId) {
+        return service.getAttemptById(attemptId);
+    }
+
+    @GetMapping("/exam/{examId}")
+    public List<AttemptEntity> getAttemptsByExam(@PathVariable Long examId) {
+        return service.getAttemptsByExamId(examId);
     }
 
     @PutMapping("/submit/{attemptId}")

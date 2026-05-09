@@ -12,15 +12,9 @@ const StudentClassesView = () => {
 
     const fetchClasses = async () => {
       try {
-        // 🔥 Get logged-in user
-        const userRes = await fetch(
-          `http://localhost:8080/api/auth/me?email=${user.email}`
-        );
-        const userData = await userRes.json();
-
         // 🔥 Get classes
         const res = await fetch(
-          `http://localhost:8080/api/classes/student/${userData.id}`
+          `http://localhost:8080/api/classes/student/${user.id}`
         );
 
         const data = await res.json();

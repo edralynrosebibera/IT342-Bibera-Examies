@@ -21,7 +21,7 @@ const ClassesCard = ({ classItem }) => {
         <span>📚 {classItem.exams} Exams</span>
       </div>
 
-      <button className="class-btn">
+      <button className="class-btn" onClick={classItem.onViewStudents}>
         View Students
       </button>
 
