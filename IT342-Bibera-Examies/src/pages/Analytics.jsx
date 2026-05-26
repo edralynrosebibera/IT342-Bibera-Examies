@@ -29,11 +29,6 @@ const Analytics = () => {
   const { user, signOut } = useAuth();
   const dropdownRef = useRef();
 
-  const toIdString = (value) => (value == null ? "" : String(value));
-
-  const getExamClassId = (exam) =>
-    toIdString(exam?.classId ?? exam?.class?.id ?? exam?.class_id);
-
   // Close dropdown
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -72,42 +67,13 @@ const Analytics = () => {
         const enrollmentsData = await enrollmentsRes.json();
         setEnrollments(Array.isArray(enrollmentsData) ? enrollmentsData : []);
 
-        const [examsByClassRes, examsByTeacherRes] = await Promise.all([
-          fetch(`http://localhost:8080/api/exams/class/${classId}`),
-          fetch(`http://localhost:8080/api/exams/teacher/${user.id}`)
-        ]);
+        const examsRes = await fetch(`http://localhost:8080/api/exams/class/${classId}`);
+        if (!examsRes.ok) throw new Error('Unable to fetch exams');
+        const examsData = await examsRes.json();
+        setExams(Array.isArray(examsData) ? examsData : []);
 
-        if (!examsByClassRes.ok && !examsByTeacherRes.ok) {
-          throw new Error('Unable to fetch exams');
-        }
-
-        const examsByClassData = examsByClassRes.ok ? await examsByClassRes.json() : [];
-        const examsByTeacherData = examsByTeacherRes.ok ? await examsByTeacherRes.json() : [];
-
-        const targetClassId = toIdString(classId);
-        const teacherClassExams = (Array.isArray(examsByTeacherData) ? examsByTeacherData : []).filter(
-          (exam) => getExamClassId(exam) === targetClassId
-        );
-
-        const classScopedExams = [...(Array.isArray(examsByClassData) ? examsByClassData : []), ...teacherClassExams]
-          .filter((exam) => exam && exam.id != null)
-          .reduce((acc, exam) => {
-            if (!acc.some((item) => item.id === exam.id)) acc.push(exam);
-            return acc;
-          }, []);
-
-        // Fallback: if class-scoped endpoints miss records, still show teacher exams.
-        const mergedExams =
-          classScopedExams.length > 0
-            ? classScopedExams
-            : (Array.isArray(examsByTeacherData) ? examsByTeacherData : []).filter(
-                (exam) => exam && exam.id != null
-              );
-
-        setExams(mergedExams);
-
-        if (mergedExams.length > 0) {
-          setSelectedExam(mergedExams[0]);
+        if (Array.isArray(examsData) && examsData.length > 0) {
+          setSelectedExam(examsData[0]);
         }
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -231,8 +197,7 @@ const Analytics = () => {
             <select
               value={selectedExam?.id || ''}
               onChange={(e) => {
-                const selectedId = toIdString(e.target.value);
-                const exam = exams.find(ex => toIdString(ex.id) === selectedId);
+                const exam = exams.find(ex => ex.id === parseInt(e.target.value));
                 setSelectedExam(exam);
               }}
               className="exam-dropdown"
@@ -240,7 +205,7 @@ const Analytics = () => {
               <option value="">-- Select an Exam --</option>
               {exams.map((exam) => (
                 <option key={exam.id} value={exam.id}>
-                  {exam.title || exam.examTitle || `Exam #${exam.id}`}
+                  {exam.title}
                 </option>
               ))}
             </select>

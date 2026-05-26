@@ -157,7 +157,7 @@ const CreateExam = () => {
         },
         body: JSON.stringify({
           instructorId: user.id,
-          classId: normalizedClassId,
+          classId: selectedClass,
           title: title,
           description: description,
           timeLimit: Number(timeLimit),

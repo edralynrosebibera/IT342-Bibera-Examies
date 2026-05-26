@@ -186,11 +186,7 @@ const ViewStudentAnswers = () => {
               <div className="options-container">
                 {currentQuestion?.options && currentQuestion.options.length > 0 ? (
                   currentQuestion.options.map((option, index) => {
-                    const selectedOptionText =
-                      typeof currentAnswer?.selectedOption === "object"
-                        ? currentAnswer?.selectedOption?.optionText
-                        : currentAnswer?.selectedOption;
-                    const isStudentAnswer = selectedOptionText === option.optionText;
+                    const isStudentAnswer = currentAnswer?.selectedOption === option.optionText;
                     const isCorrectOption = option.isCorrect === true;
 
                     return (
