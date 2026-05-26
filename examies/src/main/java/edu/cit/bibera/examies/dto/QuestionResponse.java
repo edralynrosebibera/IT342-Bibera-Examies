@@ -1,8 +1,8 @@
 package edu.cit.bibera.examies.dto;
 
 import lombok.*;
-
 import java.util.List;
+import edu.cit.bibera.examies.dto.QuestionOptionResponse;
 
 @Data
 @AllArgsConstructor
@@ -14,5 +14,5 @@ public class QuestionResponse {
     private String questionText;
     private String questionType;
     private Integer points;
-    private List<String> options; // 🔥 THIS FIXES YOUR PROBLEM
+    private List<QuestionOptionResponse> options;
 }

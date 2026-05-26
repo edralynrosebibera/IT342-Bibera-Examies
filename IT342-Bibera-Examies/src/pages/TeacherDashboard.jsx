@@ -31,13 +31,8 @@ const TeacherDashboard = () => {
 
     const fetchExams = async () => {
       try {
-        const userRes = await fetch(
-          `http://localhost:8080/api/auth/me?email=${user.email}`
-        );
-        const userData = await userRes.json();
-
         const res = await fetch(
-          `http://localhost:8080/api/exams/teacher/${userData.id}`
+          `http://localhost:8080/api/exams/teacher/${user.id}`
         );
         const data = await res.json();
 
@@ -58,7 +53,9 @@ const TeacherDashboard = () => {
     navigate("/");   // goes to ExamFlowAuth
   };
 
-  const handleViewProfile = () => console.log("View Profile clicked");
+  const handleViewProfile = () => {
+    navigate("/profile");
+  };
   const handleCreateExam = () => {
     navigate("/create-exam");
   };

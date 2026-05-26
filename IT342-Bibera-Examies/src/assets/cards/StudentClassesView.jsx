@@ -9,18 +9,16 @@ const StudentClassesView = () => {
   const { user } = useAuth();
 
   useEffect(() => {
+    if (!user?.id) {
+      setClasses([]);
+      return;
+    }
 
     const fetchClasses = async () => {
       try {
-        // 🔥 Get logged-in user
-        const userRes = await fetch(
-          `http://localhost:8080/api/auth/me?email=${user.email}`
-        );
-        const userData = await userRes.json();
-
         // 🔥 Get classes
         const res = await fetch(
-          `http://localhost:8080/api/classes/student/${userData.id}`
+          `http://localhost:8080/api/classes/student/${user.id}`
         );
 
         const data = await res.json();
@@ -28,14 +26,18 @@ const StudentClassesView = () => {
         // 🔥 DEBUG (VERY IMPORTANT)
         console.log("Fetched classes:", data);
 
-        // 🔥 FIX: Ensure it's always an array
-        if (Array.isArray(data)) {
-          setClasses(data);
-        } else if (data) {
-          setClasses([data]); // convert single object to array
-        } else {
-          setClasses([]);
-        }
+        // Keep only valid class objects to avoid null/undefined crashes
+        const normalized = Array.isArray(data)
+          ? data
+          : data
+            ? [data]
+            : [];
+
+        const safeClasses = normalized.filter(
+          (item) => item && typeof item === "object" && item.id != null
+        );
+
+        setClasses(safeClasses);
 
       } catch (error) {
         console.error("Error fetching classes:", error);
@@ -43,7 +45,7 @@ const StudentClassesView = () => {
       }
     };
 
-    if (user) fetchClasses();
+    fetchClasses();
 
   }, [user]);
 

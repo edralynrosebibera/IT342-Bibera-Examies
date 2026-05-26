@@ -1,13 +1,17 @@
 package edu.cit.bibera.examies.service;
 
 import edu.cit.bibera.examies.entity.AttemptEntity;
+import edu.cit.bibera.examies.entity.EnrollmentEntity;
 import edu.cit.bibera.examies.entity.ExamEntity;
 import edu.cit.bibera.examies.entity.QuestionEntity;
 import edu.cit.bibera.examies.entity.QuestionOptionEntity;
+import edu.cit.bibera.examies.model.Users;
+import edu.cit.bibera.examies.repository.AttemptRepository;
+import edu.cit.bibera.examies.repository.EnrollmentRepository;
 import edu.cit.bibera.examies.repository.ExamRepository;
 import edu.cit.bibera.examies.repository.QuestionOptionRepository;
-import edu.cit.bibera.examies.repository.AttemptRepository;
 import edu.cit.bibera.examies.repository.QuestionRepository;
+import edu.cit.bibera.examies.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,8 +19,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,10 +30,12 @@ public class ExamService {
     private final ExamRepository examRepository;
     private final QuestionRepository questionRepo;
     private final QuestionOptionRepository optionRepo;
+    private final EnrollmentRepository enrollmentRepository;
+    private final UsersRepository usersRepository;
 
     private final AttemptRepository attemptRepository;
 
-    // ✅ SIMPLE EXAM CREATE (not used for full exam)
+    
     public ExamEntity createExam(ExamEntity exam) {
         exam.setCreatedAt(LocalDateTime.now());
         exam.setStarted(false);
@@ -36,8 +43,8 @@ public class ExamService {
         return examRepository.save(exam);
     }
 
-    public List<ExamEntity> getTeacherExams(Long instructorId) {
-        return examRepository.findByInstructorId(instructorId);
+    public List<ExamEntity> getTeacherExams(String supabaseUserId) {
+        return examRepository.findByInstructorId(supabaseUserId);
     }
 
     public List<ExamEntity> getClassExams(Long classId) {
@@ -113,9 +120,25 @@ public class ExamService {
     return examRepository.findById(id).orElseThrow();
 }
 
-public List<Map<String, Object>> getStudentExams(Long studentId) {
+public List<Map<String, Object>> getStudentExams(String supabaseUserId) {
+        Users user = usersRepository.findBySupabaseUserId(supabaseUserId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        Long studentId = user.getId();
 
-    List<ExamEntity> exams = examRepository.findAll();
+    List<EnrollmentEntity> enrollments = enrollmentRepository.findByStudentId(studentId);
+    if (enrollments.isEmpty()) {
+        return List.of();
+    }
+
+    Set<Long> classIds = enrollments.stream()
+            .map(EnrollmentEntity::getClassId)
+            .collect(Collectors.toSet());
+
+    if (classIds.isEmpty()) {
+        return List.of();
+    }
+
+    List<ExamEntity> exams = examRepository.findByClassIdIn(new ArrayList<>(classIds));
     List<Map<String, Object>> result = new ArrayList<>();
 
     for (ExamEntity exam : exams) {

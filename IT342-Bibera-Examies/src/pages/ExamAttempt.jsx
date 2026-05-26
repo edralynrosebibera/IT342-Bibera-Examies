@@ -15,6 +15,12 @@ const ExamAttempt = () => {
   const [answers, setAnswers] = useState({});
   const [attemptId, setAttemptId] = useState(null);
 
+  const getOptionText = (option) => {
+    if (typeof option === "string") return option;
+    if (option && typeof option === "object") return option.optionText ?? "";
+    return "";
+  };
+
   // 🔥 LOAD QUESTIONS
   useEffect(() => {
     const fetchQuestions = async () => {
@@ -34,13 +40,8 @@ const ExamAttempt = () => {
     const startAttempt = async () => {
       console.log("USER:", user);
 
-      const userRes = await fetch(
-        `http://localhost:8080/api/auth/me?email=${user.email}`
-      );
-      const userData = await userRes.json();
-
       const res = await fetch(
-        `http://localhost:8080/api/attempts/start?examId=${examId}&studentId=${userData.id}`,
+        `http://localhost:8080/api/attempts/start?examId=${examId}&studentId=${user.id}`,
         { method: "POST" }
       );
 
@@ -67,7 +68,12 @@ const ExamAttempt = () => {
 
       let saved = {};
       data.forEach(a => {
-        saved[a.questionId] = a.textAnswer || a.selectedOption;
+        const selectedOptionValue =
+          typeof a.selectedOption === "object"
+            ? a.selectedOption?.optionText
+            : a.selectedOption;
+
+        saved[a.questionId] = a.textAnswer || selectedOptionValue || "";
       });
 
       setAnswers(saved);
@@ -153,15 +159,19 @@ const ExamAttempt = () => {
                 {/* 🔥 MCQ */}
                 {currentQ.questionType === "mcq" && (
                   <div className="options-grid">
-                    {currentQ.options?.map((opt, i) => (
-                      <button
-                        key={i}
-                        className={`option ${answers[currentQ.id] === opt ? "selected" : ""}`}
-                        onClick={() => handleAnswer(currentQ.id, opt)}
-                      >
-                        {opt}
-                      </button>
-                    ))}
+                    {currentQ.options?.map((opt, i) => {
+                      const optionText = getOptionText(opt);
+
+                      return (
+                        <button
+                          key={opt?.id ?? i}
+                          className={`option ${answers[currentQ.id] === optionText ? "selected" : ""}`}
+                          onClick={() => handleAnswer(currentQ.id, optionText)}
+                        >
+                          {optionText || `Option ${i + 1}`}
+                        </button>
+                      );
+                    })}
                   </div>
                 )}
 

@@ -17,7 +17,7 @@ public class ClassesEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long instructorId;
+    private String instructorId;
 
     private String className;
 
