@@ -79,6 +79,25 @@ const ViewStudentAnswers = () => {
     navigate(`/analytics/${classId}`);
   };
 
+  const formatDuration = (seconds) => {
+    if (seconds === null || seconds === undefined) return 'N/A';
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    if (mins > 0) {
+      return `${mins}m ${secs}s`;
+    }
+    return `${secs}s`;
+  };
+
+  const timeTakenSeconds = attempt?.startTime && attempt?.submittedAt
+    ? Math.max(
+        0,
+        Math.round((new Date(attempt.submittedAt).getTime() - new Date(attempt.startTime).getTime()) / 1000)
+      )
+    : null;
+
+  const formattedTimeTaken = timeTakenSeconds !== null ? formatDuration(timeTakenSeconds) : 'N/A';
+
   if (!attempt || !exam || !student) {
     return <div className="loading">Loading student answers...</div>;
   }
@@ -134,7 +153,7 @@ const ViewStudentAnswers = () => {
             </div>
             <div className="time-box">
               <span className="time-label">Time Taken</span>
-              <span className="time-value">{attempt.timeTaken || 'N/A'} minutes</span>
+              <span className="time-value">{formattedTimeTaken}</span>
             </div>
           </div>
         </div>

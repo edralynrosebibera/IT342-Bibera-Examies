@@ -14,6 +14,10 @@ const ExamAttempt = () => {
   const [current, setCurrent] = useState(0);
   const [answers, setAnswers] = useState({});
   const [attemptId, setAttemptId] = useState(null);
+  const [exam, setExam] = useState(null);
+  const [attemptStartTime, setAttemptStartTime] = useState(null);
+  const [timeLeft, setTimeLeft] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const getOptionText = (option) => {
     if (typeof option === "string") return option;
@@ -21,12 +25,28 @@ const ExamAttempt = () => {
     return "";
   };
 
+  const formatTime = (seconds) => {
+    if (seconds === null || seconds === undefined) return "--:--";
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+  };
+
+  // 🔥 LOAD EXAM DETAILS
+  useEffect(() => {
+    const fetchExam = async () => {
+      const res = await fetch(`http://localhost:8080/api/exams/${examId}`);
+      const data = await res.json();
+      setExam(data);
+    };
+
+    fetchExam();
+  }, [examId]);
+
   // 🔥 LOAD QUESTIONS
   useEffect(() => {
     const fetchQuestions = async () => {
-      const res = await fetch(
-        `http://localhost:8080/api/questions/exam/${examId}`
-      );
+      const res = await fetch(`http://localhost:8080/api/questions/exam/${examId}`);
       const data = await res.json();
       console.log("QUESTIONS:", data);
       setQuestions(data);
@@ -52,11 +72,40 @@ const ExamAttempt = () => {
         navigate("/student-dashboard");
         return;
       }
+
       setAttemptId(data.id);
+      setAttemptStartTime(data.startTime || new Date().toISOString());
     };
 
     if (user?.email) startAttempt();
   }, [user, examId]);
+
+  // 🔥 TIMER
+  useEffect(() => {
+    if (!exam?.timeLimit || !attemptStartTime) {
+      return;
+    }
+
+    const updateTimer = () => {
+      const startMillis = new Date(attemptStartTime).getTime();
+      const limitSeconds = (exam.timeLimit || 0) * 60;
+      const elapsedSeconds = Math.floor((Date.now() - startMillis) / 1000);
+      const remaining = Math.max(limitSeconds - elapsedSeconds, 0);
+      setTimeLeft(remaining);
+    };
+
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
+
+    return () => clearInterval(interval);
+  }, [exam, attemptStartTime]);
+
+  useEffect(() => {
+    if (timeLeft === 0 && attemptId && !isSubmitting) {
+      alert('Time is up! Submitting exam automatically.');
+      handleSubmit();
+    }
+  }, [timeLeft, attemptId, isSubmitting]);
 
   // 🔥 LOAD SAVED ANSWERS
   useEffect(() => {
@@ -110,13 +159,26 @@ const ExamAttempt = () => {
 
   // 🔥 SUBMIT
   const handleSubmit = async () => {
-    await fetch(
-      `http://localhost:8080/api/attempts/submit/${attemptId}`,
-      { method: "PUT" }
-    );
+    if (isSubmitting || !attemptId) {
+      return;
+    }
 
-    alert("Exam submitted!");
-    navigate("/student-dashboard");
+    setIsSubmitting(true);
+
+    try {
+      await fetch(
+        `http://localhost:8080/api/attempts/submit/${attemptId}`,
+        { method: "PUT" }
+      );
+
+      alert("Exam submitted!");
+      navigate("/student-dashboard");
+    } catch (error) {
+      console.error('Submit error:', error);
+      alert('Failed to submit exam. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const currentQ = questions[current];
@@ -131,6 +193,17 @@ const ExamAttempt = () => {
         </div>
 
         <div className="nav-right exam-nav-right">
+          <div className="timer-status">
+            <div>
+              <span className="timer-label">Time limit:</span>
+              <strong>{exam?.timeLimit ? `${exam.timeLimit} min` : "No limit"}</strong>
+            </div>
+            <div>
+              <span className="timer-label">Time left:</span>
+              <strong>{timeLeft !== null ? formatTime(timeLeft) : "--:--"}</strong>
+            </div>
+          </div>
+
           <button 
             className="header-btn secondary"
             onClick={() => navigate("/student-dashboard")}

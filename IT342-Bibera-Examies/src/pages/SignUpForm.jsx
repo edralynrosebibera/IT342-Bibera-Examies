@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { toast } from "sonner";
-import "../assets/styles/SignUpForm.css";
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+import { useAuth } from '../contexts/AuthContext';
+import '../assets/styles/SignUpForm.css';
 
 const SignUpForm = ({ role, setRole }) => {
   const [loading, setLoading] = useState(false);
-
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -12,11 +13,27 @@ const SignUpForm = ({ role, setRole }) => {
     password: ''
   });
 
+  const navigate = useNavigate();
+  const { signIn } = useAuth();
+
   const handleInputChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
     });
+  };
+
+  const redirectByRole = (userRole) => {
+    const normalizedRole = userRole?.toLowerCase();
+    if (normalizedRole === 'student') {
+      navigate('/student-dashboard');
+    } else if (normalizedRole === 'teacher') {
+      navigate('/teacher-dashboard');
+    } else if (normalizedRole === 'admin') {
+      navigate('/admin');
+    } else {
+      navigate('/profile');
+    }
   };
 
   const handleSignUp = async (e) => {
@@ -31,10 +48,7 @@ const SignUpForm = ({ role, setRole }) => {
       role: role?.toUpperCase()
     };
 
-    console.log("Signup payload:", payload);
-
     try {
-
       const response = await fetch('http://localhost:8080/api/auth/signup', {
         method: 'POST',
         headers: {
@@ -43,22 +57,9 @@ const SignUpForm = ({ role, setRole }) => {
         body: JSON.stringify(payload)
       });
 
-      if (response.ok) {
-
-        toast.success("Account created successfully! Please check your email to verify your account.");
-
-        setFormData({
-          firstName: '',
-          lastName: '',
-          email: '',
-          password: ''
-        });
-
-      } else {
-
+      if (!response.ok) {
         const text = await response.text();
-        let errorMessage = "Signup failed";
-
+        let errorMessage = 'Signup failed';
         if (text) {
           try {
             const errorJson = JSON.parse(text);
@@ -67,41 +68,47 @@ const SignUpForm = ({ role, setRole }) => {
             errorMessage = text;
           }
         }
-
         toast.error(errorMessage);
+        return;
       }
 
+      toast.success('Account created successfully!');
+
+      const { data: signInData, error: signInError } = await signIn(formData.email, formData.password);
+      if (signInError || !signInData?.user) {
+        console.warn('Signup succeeded, but auto-login failed:', signInError?.message);
+        navigate('/');
+        return;
+      }
+
+      redirectByRole(role);
+
+      setFormData({
+        firstName: '',
+        lastName: '',
+        email: '',
+        password: ''
+      });
     } catch (error) {
-
-      console.error("Signup error:", error);
-      toast.error("Signup failed. Please try again.");
-
+      console.error('Signup error:', error);
+      toast.error('Signup failed. Please try again.');
     } finally {
-
       setLoading(false);
-
     }
   };
 
   return (
     <form className="auth-form fade-in" onSubmit={handleSignUp}>
-
       <div className="role-header">
         <span className={`role-tag ${role}`}>
           {role === 'student' ? '🎓 Student' : '📖 Teacher'}
         </span>
-
-        <button
-          type="button"
-          className="change-role-btn"
-          onClick={() => setRole(null)}
-        >
+        <button type="button" className="change-role-btn" onClick={() => setRole(null)}>
           Change role
         </button>
       </div>
 
       <div className="form-row">
-
         <div className="input-group">
           <label>First Name *</label>
           <input
@@ -125,7 +132,6 @@ const SignUpForm = ({ role, setRole }) => {
             required
           />
         </div>
-
       </div>
 
       <div className="input-group">
@@ -152,14 +158,9 @@ const SignUpForm = ({ role, setRole }) => {
         />
       </div>
 
-      <button
-        type="submit"
-        className="submit-btn pink-gradient"
-        disabled={loading}
-      >
+      <button type="submit" className="submit-btn pink-gradient" disabled={loading}>
         {loading ? 'Creating Account...' : 'Create Account'}
       </button>
-
     </form>
   );
 };
