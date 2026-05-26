@@ -35,6 +35,13 @@ const CreateExam = () => {
   const [description, setDescription] = useState("");
   const [timeLimit, setTimeLimit] = useState("");
 
+  const normalizeId = (value) => {
+    if (value == null) return null;
+    const trimmed = String(value).trim();
+    if (!trimmed) return null;
+    return /^\d+$/.test(trimmed) ? Number(trimmed) : trimmed;
+  };
+
   const activeQ = questions.find(q => q.id === activeQuestion);
 
   const addQuestion = () => {
@@ -141,6 +148,7 @@ const CreateExam = () => {
         : "http://localhost:8080/api/exams";
 
       const method = isEditMode ? "PUT" : "POST";
+      const normalizedClassId = normalizeId(selectedClass);
 
       const res = await fetch(url, {
         method: method,
@@ -152,8 +160,8 @@ const CreateExam = () => {
           classId: selectedClass,
           title: title,
           description: description,
-          timeLimit: timeLimit,
-          dueDate: dueDate,
+          timeLimit: Number(timeLimit),
+          dueDate: dueDate || null,
           questions: questions.map(q => ({
             questionText: q.text,
             questionType: q.type,
@@ -216,7 +224,7 @@ const CreateExam = () => {
           setDescription(data.description);
           setTimeLimit(data.timeLimit);
           setDueDate(data.dueDate?.slice(0, 16));
-          setSelectedClass(data.classId);
+          setSelectedClass(String(data.classId ?? data.class?.id ?? ""));
 
           const mappedQuestions = data.questions.map((q, index) => ({
             id: index + 1,
@@ -304,9 +312,9 @@ const CreateExam = () => {
                   value={selectedClass}
                   onChange={(e) => setSelectedClass(e.target.value)}
                 >                
-                  <option>Select Class</option>
+                  <option value="">Select Class</option>
                   {classes.map(c => (
-                    <option key={c.id} value={c.id}>{c.className}</option>
+                    <option key={c.id} value={String(c.id)}>{c.className}</option>
                   ))}
                 </select>
               </div>
