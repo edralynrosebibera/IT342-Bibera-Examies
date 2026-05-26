@@ -36,16 +36,36 @@ const LoginForm = () => {
       if (data.user) {
         toast.success("Login Successful!");
 
-        const role = data.user.user_metadata?.role?.toLowerCase();
+        let role = data.user.user_metadata?.role?.toLowerCase();
 
-        console.log("Role from Supabase:", role);
+        // If metadata role is missing, fetch role from backend users table
+        if (!role && data.user?.email) {
+          try {
+            const res = await fetch(
+              `http://localhost:8080/api/auth/me?email=${encodeURIComponent(data.user.email)}`
+            );
+            if (res.ok) {
+              const body = await res.json();
+              // backend returns Users entity with `role` like "STUDENT"
+              role = (body.role || body.user_metadata?.role || '').toString().toLowerCase();
+            } else {
+              console.warn('Could not fetch user role from backend:', res.status);
+            }
+          } catch (err) {
+            console.warn('Error fetching role from backend:', err);
+          }
+        }
 
-        if (role === "student") {
-          navigate("/student-dashboard");
-        } else if (role === "teacher") {
-          navigate("/teacher-dashboard");
+        console.log('Resolved role:', role);
+
+        if (role === 'student') {
+          navigate('/student-dashboard');
+        } else if (role === 'teacher') {
+          navigate('/teacher-dashboard');
+        } else if (role === 'admin') {
+          navigate('/admin');
         } else {
-          navigate("/dashboard");
+          navigate('/profile');
         }
       }
     } catch (error) {

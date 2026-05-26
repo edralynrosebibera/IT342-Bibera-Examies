@@ -11,6 +11,7 @@ import AnimatedBackground from "./pages/AnimatedBackground";
 import AdminDashboard from "./pages/AdminDashboard";
 import Analytics from "./pages/Analytics";
 import ViewStudentAnswers from "./pages/ViewStudentAnswers";
+import DashboardRedirect from "./pages/DashboardRedirect";
 import { Toaster } from "sonner";
 import { AuthProvider } from "./contexts/AuthContext";
 import "./App.css";
@@ -29,6 +30,7 @@ function App() {
             {/* The Student Dashboard Page */}
             <Route path="/student-dashboard" element={<StudentDashboard />} />
             <Route path="/teacher-dashboard" element={<TeacherDashboard />} />
+            <Route path="/dashboard" element={<DashboardRedirect />} />
             <Route path="/create-exam" element={<CreateExam />} />
             <Route path="/edit-exam/:id" element={<CreateExam />} />
             <Route path="/create-class" element={<CreateClass />} />
