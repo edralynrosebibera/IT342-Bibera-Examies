@@ -25,6 +25,20 @@ export const auth = {
     return { data, error }
   },
 
+  signInWithOAuth: async (provider, redirectTo) => {
+    const options = {
+      ...(redirectTo ? { redirectTo } : {}),
+      queryParams: {
+        prompt: 'select_account'
+      }
+    };
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider,
+      options
+    })
+    return { data, error }
+  },
+
   signOut: async () => {
     const { error } = await supabase.auth.signOut()
     return { error }

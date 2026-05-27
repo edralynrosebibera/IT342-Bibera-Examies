@@ -12,7 +12,12 @@ const DashboardRedirect = () => {
       return;
     }
 
-    const role = user.user_metadata?.role?.toLowerCase();
+    const resolveRole = (u) => {
+      const r = u?.user_metadata?.role || u?.app_metadata?.role || ''
+      return r?.toString()?.toLowerCase() || ''
+    }
+
+    const role = resolveRole(user);
 
     if (role === 'student') {
       navigate('/student-dashboard');

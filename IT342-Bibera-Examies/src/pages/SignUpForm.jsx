@@ -1,20 +1,28 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../lib/supabase';
 import '../assets/styles/SignUpForm.css';
 
-const SignUpForm = ({ role, setRole }) => {
+const SignUpForm = ({ role, setRole, initialEmail = '', oauth = false, supabaseUserId = '' }) => {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
-    email: '',
+    email: initialEmail || '',
     password: ''
   });
 
   const navigate = useNavigate();
   const { signIn } = useAuth();
+
+  useEffect(() => {
+    setFormData((current) => ({
+      ...current,
+      email: initialEmail || current.email
+    }));
+  }, [initialEmail]);
 
   const handleInputChange = (e) => {
     setFormData({
@@ -42,10 +50,12 @@ const SignUpForm = ({ role, setRole }) => {
 
     const payload = {
       email: formData.email,
-      password: formData.password,
+      password: oauth ? undefined : formData.password,
       firstName: formData.firstName,
       lastName: formData.lastName,
-      role: role?.toUpperCase()
+      role: role?.toUpperCase(),
+      oauth: oauth || false,
+      supabaseUserId: oauth ? supabaseUserId : undefined
     };
 
     try {
@@ -73,6 +83,26 @@ const SignUpForm = ({ role, setRole }) => {
       }
 
       toast.success('Account created successfully!');
+
+      // For OAuth signups we assume the Supabase session is already active.
+      // Do not attempt to sign in with password when `oauth` is true.
+      if (oauth) {
+        await supabase.auth.updateUser({
+          data: {
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+            role: role?.toUpperCase()
+          }
+        });
+        redirectByRole(role);
+        setFormData({
+          firstName: '',
+          lastName: '',
+          email: '',
+          password: ''
+        });
+        return;
+      }
 
       const { data: signInData, error: signInError } = await signIn(formData.email, formData.password);
       if (signInError || !signInData?.user) {
@@ -143,9 +173,14 @@ const SignUpForm = ({ role, setRole }) => {
           value={formData.email}
           onChange={handleInputChange}
           required
+          readOnly={!!initialEmail}
         />
+        {oauth && initialEmail && (
+          <small className="note">Email provided by Google</small>
+        )}
       </div>
 
+      {!oauth && (
       <div className="input-group">
         <label>Password *</label>
         <input
@@ -157,6 +192,7 @@ const SignUpForm = ({ role, setRole }) => {
           required
         />
       </div>
+      )}
 
       <button type="submit" className="submit-btn pink-gradient" disabled={loading}>
         {loading ? 'Creating Account...' : 'Create Account'}

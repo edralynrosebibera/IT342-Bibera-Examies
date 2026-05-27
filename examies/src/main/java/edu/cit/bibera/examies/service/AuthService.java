@@ -41,6 +41,39 @@ public class AuthService {
                 throw new RuntimeException("User already exists");
             }
 
+            if (Boolean.TRUE.equals(request.getOauth())) {
+                if (request.getSupabaseUserId() == null || request.getSupabaseUserId().isBlank()) {
+                    throw new RuntimeException("Missing Google user id");
+                }
+
+                Users.UserRole role = parseRole(request.getRole());
+
+                Users user = Users.builder()
+                        .supabaseUserId(request.getSupabaseUserId())
+                        .email(request.getEmail())
+                        .firstName(request.getFirstName())
+                        .lastName(request.getLastName())
+                        .role(role)
+                        .build();
+
+                usersRepository.save(user);
+
+                Map<String, Object> metadata = new HashMap<>();
+                metadata.put("first_name", request.getFirstName());
+                metadata.put("last_name", request.getLastName());
+                metadata.put("role", request.getRole());
+
+                SupabaseUser supabaseUser = SupabaseUser.builder()
+                        .id(request.getSupabaseUserId())
+                        .email(request.getEmail())
+                        .user_metadata(metadata)
+                        .build();
+
+                return AuthResponse.builder()
+                        .user(supabaseUser)
+                        .build();
+            }
+
             String signUpUrl = getAuthUrl() + "/signup";
 
             Map<String, Object> userData = new HashMap<>();
@@ -84,15 +117,7 @@ public class AuthService {
 
             SupabaseUser supabaseUser = body.getUser();
 
-            Users.UserRole role;
-
-            try {
-                role = Users.UserRole.valueOf(
-                        request.getRole().trim().toUpperCase()
-                );
-            } catch (Exception e) {
-                throw new RuntimeException("Invalid role: " + request.getRole());
-            }
+            Users.UserRole role = parseRole(request.getRole());
 
             Users user = Users.builder()
                     .supabaseUserId(supabaseUser.getId())
@@ -111,6 +136,14 @@ public class AuthService {
         } catch (Exception e) {
             log.error("Error during signup", e);
             throw new RuntimeException("Signup failed: " + e.getMessage());
+        }
+    }
+
+    private Users.UserRole parseRole(String role) {
+        try {
+            return Users.UserRole.valueOf(role.trim().toUpperCase());
+        } catch (Exception e) {
+            throw new RuntimeException("Invalid role: " + role);
         }
     }
 
