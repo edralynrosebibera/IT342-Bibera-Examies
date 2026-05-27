@@ -7,7 +7,7 @@ import "../assets/styles/LoginForm.css";
 
 const LoginForm = () => {
   const navigate = useNavigate();
-  const { signIn } = useAuth();
+  const { signIn, signInWithProvider } = useAuth();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
@@ -36,7 +36,12 @@ const LoginForm = () => {
       if (data.user) {
         toast.success("Login Successful!");
 
-        let role = data.user.user_metadata?.role?.toLowerCase();
+        const resolveRole = (u) => {
+          const r = u?.user_metadata?.role || u?.app_metadata?.role || ''
+          return r?.toString()?.toLowerCase() || ''
+        }
+
+        let role = resolveRole(data.user);
 
         // If metadata role is missing, fetch role from backend users table
         if (!role && data.user?.email) {
@@ -118,7 +123,17 @@ const LoginForm = () => {
       <button
         type="button"
         className="google-btn"
-        onClick={() => toast.info("Google login coming soon!")}
+        onClick={async () => {
+          setLoading(true);
+          try {
+            // Start OAuth redirect to Google; callback handled by /oauth-callback
+            await signInWithProvider('google', window.location.origin + '/oauth-callback');
+          } catch (err) {
+            console.error('Google sign-in error', err);
+            toast.error('Google sign-in failed');
+            setLoading(false);
+          }
+        }}
       >
         <img
           src="https://i.pinimg.com/1200x/45/20/dd/4520ddfc56208707045c56232e946f7f.jpg"

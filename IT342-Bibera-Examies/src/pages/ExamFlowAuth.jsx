@@ -1,12 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import LoginForm from './LoginForm';
 import SignUpForm from './SignUpForm';
 import RoleSelection from './RoleSelection';
 import "../assets/styles/ExamFlowAuth.css";
+import { useLocation } from 'react-router-dom';
 
 const ExamFlowAuth = () => {
   const [activeTab, setActiveTab] = useState('login');
   const [role, setRole] = useState(null);
+  const [initialEmail, setInitialEmail] = useState('');
+  const [oauthSignup, setOauthSignup] = useState(false);
+  const [supabaseUserId, setSupabaseUserId] = useState('');
+  const location = useLocation();
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get('signup')) {
+      setActiveTab('signup');
+    }
+    const email = params.get('email');
+    setInitialEmail(email || '');
+    setOauthSignup(params.get('oauth') === '1');
+    setSupabaseUserId(params.get('supabaseUserId') || '');
+  }, [location.search]);
 
   return (
     <div className="page-container">
@@ -38,7 +54,13 @@ const ExamFlowAuth = () => {
           ) : !role ? (
             <RoleSelection setRole={setRole} />
           ) : (
-            <SignUpForm role={role} setRole={setRole} />
+            <SignUpForm
+              role={role}
+              setRole={setRole}
+              initialEmail={initialEmail}
+              oauth={oauthSignup}
+              supabaseUserId={supabaseUserId}
+            />
           )}
         </div>
 

@@ -61,12 +61,23 @@ export const AuthProvider = ({ children }) => {
     }
   }
 
+  const signInWithProvider = async (provider, redirectTo) => {
+    setLoading(true)
+    try {
+      const result = await auth.signInWithOAuth(provider, redirectTo)
+      return result
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const value = {
     user,
     loading,
     signUp,
     signIn,
     signOut
+    , signInWithProvider
   }
 
   return (

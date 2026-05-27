@@ -15,4 +15,6 @@ public class SignUpRequest {
     private String firstName;
     private String lastName;
     private String role;
+    private Boolean oauth;
+    private String supabaseUserId;
 }
